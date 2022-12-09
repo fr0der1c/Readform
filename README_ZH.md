@@ -41,7 +41,7 @@ Readform 不是基于云的服务，您需要在自己的机器上运行它。�
      ```
     `-e` 表示给容器添加环境变量。目前，有以下环境变量可用：
     - `READFORM_WEBSITES`：您要订阅的网站。必填。 允许值：`the_initium`、`caixin`。
-    - `READFORM_SAVE_FIRST_FETCH`：是否保存 RSS feed 的第一次提取。 允许值：`yes`、`no`。 默认值为“no”，这意味着在程序启动后发布的新文章才会保存到阅读器。更改为 yes 将立即将第一批文章保存到 Reader。如果您已经自己将这些网页保存到了 Reader，这会将这些项目添加到您的 library 的顶部。
+    - `READFORM_SAVE_FIRST_FETCH`：是否保存 RSS feed 的第一次提取。 允许值：`yes`、`no`。 默认值为“yes”，这意味着程序运行后将立即将第一批文章保存到 Reader。如果您已经自己将这些网页保存到了 Reader，这会将这些项目添加到您的 library 的顶部。若更改为 no，则在程序启动后发布的新文章才会保存到 Reader。 
     - `THE_INITIUM_USERNAME`：用于登录端的用户名。 如果 `the_initium` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。
     - `THE_INITIUM_PASSWORD`：用于登录端的密码。 如果 `the_initium` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。
     - `CAIXIN_USERNAME`：用于登录财新的用户名。 如果 `caixin` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。

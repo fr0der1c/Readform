@@ -58,7 +58,6 @@ class WebsiteAgent(metaclass=ABCMeta):
         exclusive lock of Selenium driver of current agent.
         """
         with self._driver_lock:
-            logger.info(f"got lock for url {url}")
             self.driver.get(url)
             self.check_finish_loading()
             self.ensure_logged_in()

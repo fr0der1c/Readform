@@ -88,12 +88,12 @@ class TheInitium(WebsiteAgent):
         next_button.click()
 
         # wait for login form to disappear
-        WebDriverWait(driver, timeout=100).until(invisibility_of_element_located(login_form))
+        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(login_form))
         self.wait_article_body()
 
         # wait paywall to disappear
         paywall_locator = (By.CSS_SELECTOR, "div.paywall")
-        WebDriverWait(driver, timeout=100).until(invisibility_of_element_located(paywall_locator))
+        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(paywall_locator))
 
 
 if __name__ == '__main__':

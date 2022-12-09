@@ -40,7 +40,7 @@ Running in Docker is the recommended way to use Readform. If you don't have Dock
     ```
    `-e` represents adding an environment variable to the container. Currently, there are following environment variables available:
    - `READFORM_WEBSITES`: the websites you are subscribed to. Required. Allowed values: `the_initium`, `caixin`.
-   - `READFORM_SAVE_FIRST_FETCH`: Whether to save first fetch of the feed. Allowed values: `yes`,`no`. The default value is `no`, meaning only new articles after the first fetch will be saved to Reader. Changing to `yes` will immediately save articles in the first batch of fetch to Reader. If you already saved these pages, this will bump existing items to the top of your library.
+   - `READFORM_SAVE_FIRST_FETCH`: Whether to save first fetch of the feed. Allowed values: `yes`,`no`. The default value is `yes`, meaning articles in the first batch of fetch will be sent to Reader. If you already saved these pages, this will bump existing items to the top of your library. If you set to `no`, only new articles after the first fetch will be saved to Reader.
    - `THE_INITIUM_USERNAME`: the username used to log in to The Initium. This is required if `the_initium` is in `READFORM_WEBSITES`, otherwise optional.
    - `THE_INITIUM_PASSWORD`: the password used to log in to The Initium. This is required if `the_initium` is in `READFORM_WEBSITES`, otherwise optional.
    - `CAIXIN_USERNAME`: the username used to log in to Caixin. This is required if `caixin` is in `READFORM_WEBSITES`, otherwise optional.

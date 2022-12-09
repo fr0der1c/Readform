@@ -5,4 +5,4 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 def get_element_with_wait(driver: WebDriver, locator) -> WebElement:
-    return WebDriverWait(driver, 30, 0.5).until(EC.presence_of_element_located(locator))
+    return WebDriverWait(driver, 300, 0.5).until(EC.presence_of_element_located(locator))

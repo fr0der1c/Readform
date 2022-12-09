@@ -65,7 +65,7 @@ def get_page_content(url: str) -> str:
         raise DomainNotSupportedException
 
 
-save_first_fetch = False
+save_first_fetch = True
 
 article_retry_queue = queue.Queue()
 

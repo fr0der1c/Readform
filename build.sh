@@ -1,0 +1,1 @@
+docker build . -t fr0der1c/readform:latest

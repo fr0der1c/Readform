@@ -101,6 +101,7 @@ class Caixin(WebsiteAgent):
 
         next_button = login_form.find_element(By.CSS_SELECTOR, 'button.login-btn')
         next_button.click()
+        logger.info("waiting to be redirected...")
 
         # wait for login form to disappear
         WebDriverWait(driver, timeout=100).until(invisibility_of_element_located(login_form))

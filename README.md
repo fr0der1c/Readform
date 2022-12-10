@@ -19,7 +19,7 @@ Currently, I use Readwise Reader as my RSS reader (it's still in private beta) s
 The final goal of this project is to push these websites to provide their official full-content RSS feed for their subscribers. Before that, let's use this program!
 
 ## How it works
-The program gets the latest articles using the website's RSS feed continuously. When there are new articles, it simulates a browser(using Chromedriver and Selenium) and logs in using your credentials to get full HTML content. Lazy-loading images will be properly handled, so you don't have to worry about missing images. The program will send the article URL and its HTML content to Readwise Reader using the official Reader API, so you can see them in your feed section.
+The program gets the latest articles using the website's RSS feed continuously. When there are new articles, it simulates a browser(using Firefox and Selenium) and logs in using your credentials to get full HTML content. Lazy-loading images will be properly handled, so you don't have to worry about missing images. The program will send the article URL and its HTML content to Readwise Reader using the official Reader API, so you can see them in your feed section.
 
 
 ## Quick start

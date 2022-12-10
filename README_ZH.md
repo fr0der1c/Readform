@@ -18,11 +18,11 @@
 该项目的最终目标是推动这些网站为其订户提供官方全文 RSS。在此之前，让我们使用这个程序吧！
 
 ## 这个程序是如何工作的？
-该程序不断使用网站的 RSS 源获取最新文章。当有新文章时，它会模拟浏览器（使用 Chromedriver 和 Selenium）并使用您的凭据登录以获取完整的 HTML 内容。 懒加载的图片会被妥善处理，不用担心图片丢失。 该程序将使用官方 Reader API 将文章 URL 及其 HTML 内容发送到 Readwise Reader，因此您可以在您的 Reader 的 feed 部分中看到它们。
+该程序不断使用网站的 RSS 源获取最新文章。当有新文章时，它会模拟浏览器（使用 Firefox 和 Selenium）并使用您的凭据登录以获取完整的 HTML 内容。 懒加载的图片会被妥善处理，不用担心图片丢失。 该程序将使用官方 Reader API 将文章 URL 及其 HTML 内容发送到 Readwise Reader，因此您可以在您的 Reader 的 feed 部分中看到它们。
 
 
 ## 快速开始
-Readform 不是基于云的服务，您需要在自己的机器上运行它。这将为您提供最高程度的安全性，因为使用此程序需要您的网站的用户名和密码。您可以在本地设备（PC、Mac、NAS、Raspberry Pi 等）上安装 Readform 或将其部署在 VPS 上。
+Readform 不是基于云的服务，您需要在自己的机器上运行它。这将为您提供最高程度的安全性，因为使用此程序需要您的网站的用户名和密码。您可以在长期开机的本地设备（PC、Mac、NAS、Raspberry Pi 等）上安装 Readform，或将其部署在 VPS 上。
 
 推荐使用 Docker 运行 Readform。 如果您的计算机上没有 Docker，您可以[在此处下载](https://docs.docker.com/get-docker/)。
 

@@ -6,7 +6,7 @@ import traceback
 from threading import Thread
 
 from tool_logging import logger
-from persistence import mark_url_as_saved
+from persistence import mark_url_as_saved, filter_saved_urls
 
 readwise_token = ""
 readwise_location = "feed"
@@ -30,6 +30,12 @@ def saver():
     logger.info("[Readwise] Saver started running...")
     while True:
         item = save_queue.get()
+
+        # recheck if item already saved
+        if len(filter_saved_urls([item.url])) == 0:
+            save_queue.task_done()
+            continue
+
         i = 0
         success = False
         while i <= 3:

@@ -14,7 +14,7 @@ Will be supported in the future:
 ## Why I built Readform
 There is plenty of high-quality subscription-based media on the market. And I respect their work. Being said that, I believe it's the subscriber's right to read in different forms he/she likes, e.g. RSS reader. **Pro readers have their own customized reading workflow. "Pro" media that charges for their articles should respect their reader's own choice.** Since there is no official full-article RSS feed support for these websites, I decided to make my own. 
 
-Currently, I use Readwise Reader as my RSS reader (it's still in private beta) so I made the Readwise Reader output integration. However, RSS output may also be supported in the future.
+Currently, I use Readwise Reader as my RSS reader, so I made the Readwise Reader output integration. However, RSS output may also be supported in the future.
 
 The final goal of this project is to push these websites to provide their official full-content RSS feed for their subscribers. Before that, let's use this program!
 

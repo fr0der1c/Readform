@@ -1,11 +1,19 @@
 import os
-from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 
-chrome_opt = Options()
-chrome_opt.add_argument('--no-sandbox')
-# chrome_opt.add_argument('--headless')
+firefox_opt = Options()
 if os.getenv("IS_IN_CONTAINER"):
-    chrome_opt.add_argument('--headless')
-chrome_opt.set_capability('chromeOptions', {'w3c': False})
-chrome_opt.set_capability('showChromedriverLog', True)
-# chrome_opt.add_argument("user-data-dir=chrome-data")
+    firefox_opt.headless = True
+
+profile = webdriver.FirefoxProfile()
+profile.set_preference("dom.webdriver.enabled", False)
+profile.set_preference('useAutomationExtension', False)
+profile.update_preferences()
+
+
+def get_browser():
+    browser = webdriver.Firefox(options=firefox_opt,
+                                firefox_profile=profile,
+                                desired_capabilities=webdriver.DesiredCapabilities.FIREFOX)
+    return browser

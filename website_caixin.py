@@ -6,9 +6,8 @@ from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import invisibility_of_element_located
-from selenium import webdriver
 
-from driver import chrome_opt
+from driver import get_browser
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
 from website_base import WebsiteAgent
@@ -110,7 +109,7 @@ class Caixin(WebsiteAgent):
 
 if __name__ == '__main__':
     init_readwise()
-    caixin = Caixin(webdriver.Chrome(options=chrome_opt))
+    caixin = Caixin(get_browser())
     # time.sleep(10)
 
     # contains video

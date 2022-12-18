@@ -10,7 +10,7 @@ from selenium import webdriver
 from tool_selenium import get_element_with_wait
 from website_base import WebsiteAgent
 from readwise import send_to_readwise_reader, init_readwise, save_queue
-from driver import chrome_opt
+from driver import get_browser
 
 
 class TheInitium(WebsiteAgent):
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     init_readwise()
 
     url = "https://theinitium.com/article/20221209-mainland-zero-covid-protest-public-opinion/invite_token/tIoocQQCjc"
-    agent = TheInitium(webdriver.Chrome(options=chrome_opt))
+    agent = TheInitium(get_browser())
     full_html = agent.get_page_content(url)
     print(f"get full html success: {full_html}")
     send_to_readwise_reader(url, full_html, agent.name())

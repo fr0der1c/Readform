@@ -5,15 +5,13 @@ import traceback
 from typing import Dict
 from threading import Thread
 
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-
 from readwise import init_readwise, send_to_readwise_reader
 from website_base import WebsiteAgent
 from website_the_initium import TheInitium
 from website_caixin import Caixin
 from persistence import mark_url_as_saved
 from tool_logging import logger
+from driver import get_browser
 
 handler_dict: Dict[str, WebsiteAgent] = {
 }
@@ -34,15 +32,13 @@ def init_agents():
         logger.error("READFORM_WEBSITES not set or empty, please set this env to get the program working")
         exit(1)
     loaded = set()
-    options = Options()
-    options.headless = True
     for site in websites.split(","):
         if site in loaded:
             continue
         if site == "the_initium":
-            h = TheInitium(webdriver.Firefox(options=options))
+            h = TheInitium(get_browser())
         elif site == "caixin":
-            h = Caixin(webdriver.Firefox(options=options))
+            h = Caixin(get_browser())
         else:
             logger.error(f"unknown website {site} in READFORM_WEBSITES")
             exit(1)

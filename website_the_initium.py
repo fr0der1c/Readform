@@ -5,11 +5,10 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import invisibility_of_element_located
-from selenium import webdriver
 
 from tool_selenium import get_element_with_wait
 from website_base import WebsiteAgent
-from readwise import send_to_readwise_reader, init_readwise, save_queue
+from readwise import send_to_readwise_reader, init_readwise
 from driver import get_browser
 
 
@@ -104,4 +103,3 @@ if __name__ == '__main__':
     full_html = agent.get_page_content(url)
     print(f"get full html success: {full_html}")
     send_to_readwise_reader(url, full_html, agent.name())
-    save_queue.join()

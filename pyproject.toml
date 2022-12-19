@@ -11,6 +11,7 @@ requests = "^2.28.1"
 selenium = "^4.7.2"
 feedparser = "^6.0.10"
 sqlalchemy = "^1.4.44"
+alembic = "^1.9.0"
 
 
 [build-system]

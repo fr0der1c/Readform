@@ -9,7 +9,7 @@ from readwise import init_readwise, send_to_readwise_reader
 from website_base import WebsiteAgent
 from website_the_initium import TheInitium
 from website_caixin import Caixin
-from persistence import mark_url_as_saved
+from persistence import mark_url_as_saved, ensure_db_schema
 from tool_logging import logger
 from driver import get_browser
 
@@ -139,6 +139,7 @@ def start_refreshing_rss():
 # todo P2 provide custom feed url parameter
 
 if __name__ == "__main__":
+    ensure_db_schema()
     init_readwise()
     init_agents()
     start_refreshing_rss()

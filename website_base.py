@@ -3,8 +3,7 @@ import threading
 from abc import ABCMeta, abstractmethod
 from selenium.webdriver.chrome.webdriver import WebDriver
 from tool_rss import parse_rss_feed
-from tool_logging import logger
-from persistence import filter_saved_urls
+from persistence import filter_old_urls
 
 
 class WebsiteAgent(metaclass=ABCMeta):
@@ -108,4 +107,4 @@ class WebsiteAgent(metaclass=ABCMeta):
         will be returned. This method is called by framework if enable_rss_refreshing=True.
         """
         latest_urls = parse_rss_feed(self.rss_address)
-        return filter_saved_urls(latest_urls)
+        return filter_old_urls(latest_urls)

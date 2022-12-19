@@ -11,7 +11,7 @@ from driver import get_browser
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
 from website_base import WebsiteAgent
-from readwise import send_to_readwise_reader, init_readwise, save_queue
+from readwise import send_to_readwise_reader, init_readwise
 
 
 class Caixin(WebsiteAgent):

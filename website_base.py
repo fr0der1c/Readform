@@ -106,5 +106,5 @@ class WebsiteAgent(metaclass=ABCMeta):
         Refresh RSS to see if there are new content. A list of new article URLs
         will be returned. This method is called by framework if enable_rss_refreshing=True.
         """
-        latest_urls = parse_rss_feed(self.rss_address)
-        return filter_old_urls(latest_urls)
+        latest_items = parse_rss_feed(self.rss_address)
+        return filter_old_urls(latest_items, agent=self.name())

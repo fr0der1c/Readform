@@ -1,3 +1,5 @@
 __pycache__
 data/html
-data/readform.db
+data/*.db
+*.log
+.idea

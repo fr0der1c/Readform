@@ -107,7 +107,7 @@ def start_refreshing_rss():
                 logger.info(f"[{agent.name()}] Latest articles: {urls}")
                 for single_url in urls:
                     handle_article(single_url, agent.name())
-                    time.sleep(3)
+                    time.sleep(10)
             if is_first_run and not save_first_fetch:
                 # mark all as saved
                 for single_url in urls:
@@ -134,7 +134,6 @@ def start_refreshing_rss():
 # todo P0 test if the project can run stably on supported websites
 # todo P1 open a HTTP port to provide RSS feed, so that non-Readwise Reader users can benefit
 #         from this project too (add QPS limit to avoid abuse!)
-# todo P1 save url to article table even if it is not saved
 # todo P2 web UI, allows to add source, remove source and suspend fetching, change password on the fly
 # todo P2 provide custom feed url parameter
 

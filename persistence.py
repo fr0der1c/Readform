@@ -1,10 +1,13 @@
-from datetime import datetime
+import time
+from datetime import datetime, timezone
+from time import mktime
 
-from sqlalchemy import create_engine, Column, String, Boolean, DateTime, func, or_
+from sqlalchemy import create_engine, Column, String, Boolean, DateTime, func, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from tool_logging import logger
+from datatypes import FeedItem
 
 dsn = 'sqlite:///data/readform.db?check_same_thread=False'
 engine = create_engine(dsn)  # , echo=True
@@ -19,6 +22,7 @@ class Article(Base):
     save_time = Column(String(128))
     readwise_resp = Column(String(1024))
     content = Column(String())
+    publish_time = Column(DateTime)
 
     create_time = Column(DateTime, server_default=func.now())
     update_time = Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -41,11 +45,29 @@ def ensure_db_schema():
     run_migrations('alembic', dsn)
 
 
-def filter_old_urls(url_list: list[str]) -> list[str]:
+def utc_to_local(utc_dt: datetime):
+    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
+
+def filter_old_urls(item_list: list[FeedItem], save_publish_time=True, agent: str = None) -> list[str]:
     """Return URLs not saved to article table."""
-    saved_articles = find_article(url_list)
-    unsaved_articles = [item for item in url_list if item not in [item.url for item in saved_articles]]
-    return unsaved_articles
+    session = Session()
+    saved_articles = find_article([item.url for item in item_list], session=session)
+    unsaved_articles = [item for item in item_list if item.url not in [item.url for item in saved_articles]]
+    unsaved_urls = [item.url for item in unsaved_articles]
+
+    saved_items = [item for item in item_list if item.url not in unsaved_urls]
+    if save_publish_time:
+        for item in unsaved_articles:
+            dt = datetime.fromtimestamp(mktime(item.published_date_parsed))
+            article = Article(url=item.url, agent=agent, publish_time=utc_to_local(dt))
+            session.add(article)
+        for item in saved_items:
+            for article in saved_articles:
+                if article.url == item.url:
+                    article.publish_time = utc_to_local(datetime.fromtimestamp(mktime(item.published_date_parsed)))
+        session.commit()
+    return unsaved_urls
 
 
 def filter_saved_urls(url_list: list[str]) -> list[str]:

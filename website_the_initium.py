@@ -27,7 +27,7 @@ class TheInitium(WebsiteAgent):
         self.password = password
 
         self.base_domains = ["theinitium.com"]
-        self.require_scrolling = False
+        self.require_scrolling = True
         self.enable_rss_refreshing = True
         self.rss_address = "https://theinitium.com/newsfeed/"
 
@@ -41,6 +41,8 @@ class TheInitium(WebsiteAgent):
 
         self.get_driver().execute_script("arguments[0].click();", simplified_button)
         # this method can click invisible button
+
+        time.sleep(1)
 
         self.wait_article_body()
 

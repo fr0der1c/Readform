@@ -74,7 +74,7 @@ class WebsiteAgent(metaclass=ABCMeta):
 
     def scroll_page(self):
         """Scroll over page til the end."""
-        SCROLL_PAUSE_TIME = 0.3
+        SCROLL_PAUSE_TIME = 0.5
 
         # Get scroll height
         last_height = self.driver.execute_script("return document.body.scrollHeight")

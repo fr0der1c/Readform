@@ -117,7 +117,8 @@ def mark_url_as_saved(url: str, agent: str, resp: str):
     pass
 
 
-def find_article(url_list: list[str] = None, session=None, only_saved=False, only_not_saved=False) -> list[Article]:
+def find_article(url_list: list[str] = None, session=None, only_saved=False, only_not_saved=False,
+                 content_not_empty=False) -> list[Article]:
     if not session:
         session = Session()
     query = session.query(Article)
@@ -127,6 +128,8 @@ def find_article(url_list: list[str] = None, session=None, only_saved=False, onl
         query = query.filter(Article.saved_to_readwise == True)
     if only_not_saved:
         query = query.filter(Article.saved_to_readwise == False)
+    if content_not_empty:
+        query = query.filter(Article.content != None)
 
     return query.all()
 

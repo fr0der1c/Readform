@@ -20,7 +20,7 @@ def send_to_readwise_reader(url: str, html_content: str, agent=""):
 def saver():
     logger.info("[Readwise] Saver started running...")
     while True:
-        items = find_article(only_not_saved=True)
+        items = find_article(only_not_saved=True, content_not_empty=True)
         if len(items) == 0:
             time.sleep(5)
             continue

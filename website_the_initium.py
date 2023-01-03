@@ -35,6 +35,9 @@ class TheInitium(WebsiteAgent):
         return "the_initium"
 
     def check_finish_loading(self):
+        if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
+            # special handle for projects
+            return
         print("changing to simplified Chinese...")
         language_button_locator = (By.XPATH, '//*[@id="user-panel"]/div[3]/div/div/button[2]')
         simplified_button = get_element_with_wait(self.get_driver(), language_button_locator)
@@ -52,6 +55,9 @@ class TheInitium(WebsiteAgent):
         print("body loading finished")
 
     def ensure_logged_in(self):
+        if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
+            # special handle for projects
+            return
         if self.is_paywalled(self.get_driver()):
             print("is paywalled content and not logged-in")
             self.login(self.get_driver())

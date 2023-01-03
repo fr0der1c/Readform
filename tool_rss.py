@@ -9,5 +9,6 @@ def parse_rss_feed(url: str) -> List[FeedItem]:
     feed = feedparser.parse(url)
     items = []
     for item in feed["entries"]:
-        items.append(FeedItem(item.title, item.link, item.published_parsed))
+        items.append(
+            FeedItem(item.title, item.link, item.published_parsed if hasattr(item, "published_parsed") else None))
     return items

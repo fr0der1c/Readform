@@ -59,12 +59,13 @@ def filter_old_urls(item_list: list[FeedItem], save_publish_time=True, agent: st
     saved_items = [item for item in item_list if item.url not in unsaved_urls]
     if save_publish_time:
         for item in unsaved_articles:
-            dt = datetime.fromtimestamp(mktime(item.published_date_parsed))
-            article = Article(url=item.url, agent=agent, publish_time=utc_to_local(dt))
-            session.add(article)
+            if item.published_date_parsed:
+                dt = datetime.fromtimestamp(mktime(item.published_date_parsed))
+                article = Article(url=item.url, agent=agent, publish_time=utc_to_local(dt))
+                session.add(article)
         for item in saved_items:
             for article in saved_articles:
-                if article.url == item.url:
+                if article.url == item.url and item.published_date_parsed:
                     article.publish_time = utc_to_local(datetime.fromtimestamp(mktime(item.published_date_parsed)))
         session.commit()
     return unsaved_urls

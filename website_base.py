@@ -60,6 +60,7 @@ class WebsiteAgent(metaclass=ABCMeta):
             self.driver.get(url)
             self.check_finish_loading()
             self.ensure_logged_in()
+            self.check_finish_loading()
 
             if self.require_scrolling:
                 self.scroll_page()

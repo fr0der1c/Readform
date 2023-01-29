@@ -48,11 +48,20 @@ class TheInitium(WebsiteAgent):
         time.sleep(1)
 
         self.wait_article_body()
+        self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况
 
     def wait_article_body(self):
         print("waiting for article body to load...")
         get_element_with_wait(self.get_driver(), (By.CSS_SELECTOR, "div.article__body"))
-        print("body loading finished")
+        print("body check passed")
+
+    def wait_title(self):
+        while True:
+            if self.get_driver().title != "端传媒 Initium Media":
+                break
+            time.sleep(1)
+            print("waiting for title to change...")
+        print("title check passed")
 
     def ensure_logged_in(self):
         if self.get_driver().current_url.startswith("https://theinitium.com/project/"):

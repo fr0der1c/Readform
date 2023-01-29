@@ -45,7 +45,7 @@ class TheInitium(WebsiteAgent):
         self.get_driver().execute_script("arguments[0].click();", simplified_button)
         # this method can click invisible button
 
-        time.sleep(1)
+        time.sleep(3)
 
         self.wait_article_body()
         self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况

@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import invisibility_of_element_located
 
 from tool_selenium import get_element_with_wait
+from tool_logging import logger
 from website_base import WebsiteAgent
 from readwise import send_to_readwise_reader, init_readwise
 from driver import get_browser
@@ -38,7 +39,7 @@ class TheInitium(WebsiteAgent):
         if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
             # special handle for projects
             return
-        print("changing to simplified Chinese...")
+        logger.info("changing to simplified Chinese...")
         language_button_locator = (By.XPATH, '//*[@id="user-panel"]/div[3]/div/div/button[2]')
         simplified_button = get_element_with_wait(self.get_driver(), language_button_locator)
 
@@ -51,27 +52,27 @@ class TheInitium(WebsiteAgent):
         self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况
 
     def wait_article_body(self):
-        print("waiting for article body to load...")
+        logger.info("waiting for article body to load...")
         get_element_with_wait(self.get_driver(), (By.CSS_SELECTOR, "div.article__body"))
-        print("body check passed")
+        logger.info("body check passed")
 
     def wait_title(self):
         while True:
             if self.get_driver().title != "端传媒 Initium Media":
                 break
             time.sleep(1)
-            print("waiting for title to change...")
-        print("title check passed")
+            logger.info("waiting for title to change...")
+        logger.info("title check passed")
 
     def ensure_logged_in(self):
         if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
             # special handle for projects
             return
         if self.is_paywalled(self.get_driver()):
-            print("is paywalled content and not logged-in")
+            logger.info("is paywalled content and not logged-in")
             self.login(self.get_driver())
         else:
-            print("is not paywalled content or already logged in")
+            logger.info("is not paywalled content or already logged in")
 
     def is_paywalled(self, driver: WebDriver) -> bool:
         try:
@@ -86,7 +87,7 @@ class TheInitium(WebsiteAgent):
         Logs in using user credentials on an article page. Make sure to use throttle tool
         to test if the code will work in different speed of network after each change.
         """
-        print("logging in...")
+        logger.info("logging in...")
         login_link_selector = "#root > main > div.content__body > div > div.main-content > div.article__body > div.paywall > div.link > button"
         login_link = get_element_with_wait(driver, (By.CSS_SELECTOR, login_link_selector))
         login_link.click()

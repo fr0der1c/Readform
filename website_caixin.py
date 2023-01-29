@@ -123,7 +123,7 @@ if __name__ == '__main__':
     full_html = caixin.get_page_content(url)
     print(f"get full html success: {full_html}")
     send_to_readwise_reader(url, full_html, caixin.name())
-    save_queue.join()
+
     #
     # url = "https://www.caixin.com/2022-12-06/101974926.html"
     # full_html = caixin.get_page_content(url)

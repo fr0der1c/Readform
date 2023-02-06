@@ -1,15 +1,12 @@
-import os
 import time
 
 import requests
 import traceback
 from threading import Thread
 
+from conf import current_conf
 from tool_logging import logger
 from persistence import mark_url_as_saved, add_article, find_article
-
-readwise_token = ""
-readwise_location = "feed"
 
 
 def send_to_readwise_reader(url: str, html_content: str, agent=""):
@@ -50,9 +47,9 @@ def _send_to_readwise_reader(url: str, html_content: str) -> (int, str):
     resp = requests.post("https://readwise.io/api/v3/save/", json={"url": url,
                                                                    "html": html_content,
                                                                    "should_clean_html": True,
-                                                                   "location": readwise_location,
+                                                                   "location": current_conf.get_readwise_reader_location(),
                                                                    "saved_using": "ReadForm"},
-                         headers={"Authorization": "Token " + readwise_token}
+                         headers={"Authorization": "Token " + current_conf.get_readwise_token()}
                          )
 
     return resp.status_code, resp.content.decode('utf-8')
@@ -65,16 +62,9 @@ def start_saver_thread():
 
 
 def init_readwise():
-    token = os.getenv("READWISE_TOKEN")
+    token = current_conf.get_readwise_token()
     if not token:
-        logger.error("READWISE_TOKEN not set or empty")
+        logger.error("readwise token not set or empty")
         exit(1)
-    global readwise_token
-    readwise_token = token
-
-    location = os.getenv("READWISE_READER_LOCATION")
-    if location in ("new", "later", "archive", "feed"):
-        global readwise_location
-        readwise_location = location
 
     start_saver_thread()

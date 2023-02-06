@@ -14,15 +14,15 @@ from driver import get_browser
 
 
 class TheInitium(WebsiteAgent):
-    def __init__(self, driver: WebDriver):
-        super().__init__(driver)
-        username = os.getenv("THE_INITIUM_USERNAME")
+    def __init__(self, driver: WebDriver, conf: dict):
+        super().__init__(driver, conf)
+        username = self.conf.get("the_initium_username")
         if not username:
-            print("THE_INITIUM_USERNAME not found, cannot proceed")
+            print("the_initium_username not found, cannot proceed")
             exit(1)
-        password = os.getenv("THE_INITIUM_PASSWORD")
+        password = self.conf.get("the_initium_password")
         if not password:
-            print("THE_INITIUM_PASSWORD not found, cannot proceed")
+            print("the_initium_password not found, cannot proceed")
             exit(1)
         self.username = username
         self.password = password

@@ -1,16 +1,16 @@
 import queue
 import time
-import os
 import traceback
 from typing import Dict
 from threading import Thread
 
+from tool_logging import logger
 from readwise import init_readwise, send_to_readwise_reader
+from conf import load_conf_from_file, current_conf
 from website_base import WebsiteAgent
 from website_the_initium import TheInitium
 from website_caixin import Caixin
 from persistence import mark_url_as_saved, ensure_db_schema
-from tool_logging import logger
 from driver import get_browser
 
 handler_dict: Dict[str, WebsiteAgent] = {
@@ -22,23 +22,18 @@ def init_agents():
     Each website has its own singleton agent instance that owns a Selenium Driver.
     This is to avoid logging into the site again and again.
     """
-    sff = os.getenv("READFORM_SAVE_FIRST_FETCH")
-    global save_first_fetch
-    if sff == "yes":
-        save_first_fetch = True
-
-    websites = os.getenv("READFORM_WEBSITES")
+    websites = current_conf.enabled_websites()
     if not websites:
-        logger.error("READFORM_WEBSITES not set or empty, please set this env to get the program working")
+        logger.error("enabled_websites is empty, please set this env to get the program working")
         exit(1)
     loaded = set()
-    for site in websites.split(","):
+    for site in websites:
         if site in loaded:
             continue
         if site == "the_initium":
-            h = TheInitium(get_browser())
+            h = TheInitium(get_browser(), current_conf.get_agent_conf(site))
         elif site == "caixin":
-            h = Caixin(get_browser())
+            h = Caixin(get_browser(), current_conf.get_agent_conf(site))
         else:
             logger.error(f"unknown website {site} in READFORM_WEBSITES")
             exit(1)
@@ -62,8 +57,6 @@ def get_page_content(url: str) -> str:
     else:
         raise DomainNotSupportedException
 
-
-save_first_fetch = True
 
 article_retry_queue = queue.Queue()
 
@@ -103,12 +96,12 @@ def start_refreshing_rss():
             except Exception as e:
                 logger.error(f"[{agent.name()}] Got exception while refreshing RSS: {e.args}\n{traceback.format_exc()}")
                 continue
-            if len(urls) > 0 and not is_first_run or (is_first_run and save_first_fetch):
+            if len(urls) > 0 and not is_first_run or (is_first_run and current_conf.save_first_fetch()):
                 logger.info(f"[{agent.name()}] Latest articles: {urls}")
                 for single_url in urls:
                     handle_article(single_url, agent.name())
                     time.sleep(10)
-            if is_first_run and not save_first_fetch:
+            if is_first_run and not current_conf.save_first_fetch():
                 # mark all as saved
                 for single_url in urls:
                     mark_url_as_saved(single_url, "_system", "")
@@ -131,13 +124,13 @@ def start_refreshing_rss():
         processed.add(handler)
 
 
-# todo P0 test if the project can run stably on supported websites
 # todo P1 open a HTTP port to provide RSS feed, so that non-Readwise Reader users can benefit
 #         from this project too (add QPS limit to avoid abuse!)
 # todo P2 web UI, allows to add source, remove source and suspend fetching, change password on the fly
 # todo P2 provide custom feed url parameter
 
 if __name__ == "__main__":
+    load_conf_from_file()
     ensure_db_schema()
     init_readwise()
     init_agents()

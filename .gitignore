@@ -1,5 +1,6 @@
 __pycache__
 data/html
 data/*.db
+data/conf.json
 *.log
 .idea

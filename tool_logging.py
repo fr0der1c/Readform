@@ -24,11 +24,7 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-logger: logging.Logger = logging.root
-
-
-def init_logger():
-    global logger
+def init_logger() -> logging.Logger:
     logger = logging.getLogger("readform")
     logger.setLevel(logging.INFO)
 
@@ -39,6 +35,7 @@ def init_logger():
     ch.setFormatter(CustomFormatter())
 
     logger.addHandler(ch)
+    return logger
 
 
-init_logger()
+logger: logging.Logger = init_logger()

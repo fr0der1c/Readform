@@ -15,15 +15,15 @@ from readwise import send_to_readwise_reader, init_readwise
 
 
 class Caixin(WebsiteAgent):
-    def __init__(self, driver: WebDriver):
-        super().__init__(driver)
-        username = os.getenv("CAIXIN_USERNAME")
+    def __init__(self, driver: WebDriver, conf: dict):
+        super().__init__(driver, conf)
+        username = self.conf.get("caixin_username")
         if not username:
-            logger.error("CAIXIN_USERNAME not found, cannot proceed")
+            logger.error("caixin_username not found, cannot proceed")
             exit(1)
-        password = os.getenv("CAIXIN_PASSWORD")
+        password = self.conf.get("caixin_password")
         if not password:
-            logger.error("CAIXIN_PASSWORD not found, cannot proceed")
+            logger.error("caixin_password not found, cannot proceed")
             exit(1)
         self.username = username
         self.password = password

@@ -2,14 +2,24 @@ import time
 import threading
 from abc import ABCMeta, abstractmethod
 from selenium.webdriver.chrome.webdriver import WebDriver
+from tool_logging import logger
 from tool_rss import parse_rss_feed
 from persistence import filter_old_urls
 
+CONF_KEY_BLOCKLIST = "title_block_list"
+
+
+def contains_chinese(string:str)->bool:
+    for ch in string:
+        if u'\u4e00' <= ch <= u'\u9fff':
+            return True
+
 
 class WebsiteAgent(metaclass=ABCMeta):
-    def __init__(self, driver: WebDriver):
+    def __init__(self, driver: WebDriver, conf: dict):
         self.driver = driver
         self._driver_lock = threading.Lock()
+        self.conf = conf
 
         # ----------- Below are control options for a website ------------
         self.base_domains = []
@@ -99,6 +109,19 @@ class WebsiteAgent(metaclass=ABCMeta):
         """
         return self.driver
 
+    def _get_title_block_list(self) -> list[str]:
+        if CONF_KEY_BLOCKLIST in self.conf:
+            return [kw.lower() for kw in self.conf[CONF_KEY_BLOCKLIST]]
+        return []
+
+    def _contains_blocked_keyword(self, title: str) -> bool:
+        blocklist = self._get_title_block_list()
+        title = title.lower()
+        if title.isascii():
+            return not set(title.split(" ")).isdisjoint(blocklist)
+        else:
+            return any([title.find(kw) >= 0 for kw in blocklist])
+
     def refresh_rss(self) -> list[str]:
         """
         Refresh RSS to see if there are new content. A list of new article URLs
@@ -106,5 +129,9 @@ class WebsiteAgent(metaclass=ABCMeta):
         """
         latest_items = []
         for address in self.rss_addresses:
-            latest_items.extend(parse_rss_feed(address))
+            for item in parse_rss_feed(address):
+                if self._contains_blocked_keyword(item.title):
+                    logger.info(f"article '{item.title}' is filtered because it hits user block keyword list")
+                else:
+                    latest_items.append(item)
         return filter_old_urls(latest_items, agent=self.name()) if latest_items else []

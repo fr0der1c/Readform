@@ -31,7 +31,7 @@ class Caixin(WebsiteAgent):
         self.base_domains = ["caixin.com"]
         self.require_scrolling = False
         self.enable_rss_refreshing = True
-        self.rss_address = "https://rsshub.app/caixin/latest"
+        self.rss_addresses = ["https://rsshub.app/caixin/latest"]
 
     def name(self) -> str:
         return "caixin"

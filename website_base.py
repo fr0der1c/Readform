@@ -9,6 +9,7 @@ from persistence import filter_old_urls
 class WebsiteAgent(metaclass=ABCMeta):
     def __init__(self, driver: WebDriver):
         self.driver = driver
+        self._driver_lock = threading.Lock()
 
         # ----------- Below are control options for a website ------------
         self.base_domains = []
@@ -20,11 +21,7 @@ class WebsiteAgent(metaclass=ABCMeta):
         # If enabled, rss_address will be used to get the latest articles periodically.
         # If disabled, website updates will not be listened. Instead, you will need to
         # manually call API to save content to Readwise.
-        self.rss_address = ""
-
-        self._seen_urls = set()
-
-        self._driver_lock = threading.Lock()
+        self.rss_addresses = []
 
         # todo add rate-limit related controls
 
@@ -107,5 +104,7 @@ class WebsiteAgent(metaclass=ABCMeta):
         Refresh RSS to see if there are new content. A list of new article URLs
         will be returned. This method is called by framework if enable_rss_refreshing=True.
         """
-        latest_items = parse_rss_feed(self.rss_address)
-        return filter_old_urls(latest_items, agent=self.name())
+        latest_items = []
+        for address in self.rss_addresses:
+            latest_items.extend(parse_rss_feed(address))
+        return filter_old_urls(latest_items, agent=self.name()) if latest_items else []

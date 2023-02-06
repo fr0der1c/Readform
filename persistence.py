@@ -53,8 +53,8 @@ def filter_old_urls(item_list: list[FeedItem], save_publish_time=True, agent: st
     """Return URLs not saved to article table."""
     session = Session()
     saved_articles = find_article([item.url for item in item_list], session=session)
-    unsaved_articles = [item for item in item_list if item.url not in [item.url for item in saved_articles]]
-    unsaved_urls = [item.url for item in unsaved_articles]
+    unsaved_articles = list(set([item for item in item_list if item.url not in [item.url for item in saved_articles]]))
+    unsaved_urls = list(set([item.url for item in unsaved_articles]))
 
     saved_items = [item for item in item_list if item.url not in unsaved_urls]
     if save_publish_time:

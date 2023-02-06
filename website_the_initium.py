@@ -30,7 +30,7 @@ class TheInitium(WebsiteAgent):
         self.base_domains = ["theinitium.com"]
         self.require_scrolling = True
         self.enable_rss_refreshing = True
-        self.rss_address = "https://theinitium.com/newsfeed/"
+        self.rss_addresses = ["https://theinitium.com/newsfeed/"]
 
     def name(self) -> str:
         return "the_initium"

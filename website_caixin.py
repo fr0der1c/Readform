@@ -10,31 +10,32 @@ from selenium.webdriver.support.expected_conditions import invisibility_of_eleme
 from driver import get_browser
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
-from website_base import WebsiteAgent
+from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST
+from conf_meta import ConfMeta, FIELD_TYPE_STR_LIST
 from readwise import send_to_readwise_reader, init_readwise
 
 
 class Caixin(WebsiteAgent):
+    name = "caixin"
+    conf_options = [
+        ConfMeta(
+            "Caixin Username", "Your username for Caixin.", "caixin_username", required=True
+        ),
+        ConfMeta(
+            "Caixin Password", "Your password for Caixin.", "caixin_password", required=True
+        ),
+        ConfMeta(
+            "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
+            typ=FIELD_TYPE_STR_LIST
+        ),
+    ]  # all config keys used
+
     def __init__(self, driver: WebDriver, conf: dict):
         super().__init__(driver, conf)
-        username = self.conf.get("caixin_username")
-        if not username:
-            logger.error("caixin_username not found, cannot proceed")
-            exit(1)
-        password = self.conf.get("caixin_password")
-        if not password:
-            logger.error("caixin_password not found, cannot proceed")
-            exit(1)
-        self.username = username
-        self.password = password
-
         self.base_domains = ["caixin.com"]
         self.require_scrolling = False
         self.enable_rss_refreshing = True
         self.rss_addresses = ["https://rsshub.app/caixin/latest"]
-
-    def name(self) -> str:
-        return "caixin"
 
     def check_finish_loading(self):
         self.wait_article_body()
@@ -87,11 +88,17 @@ class Caixin(WebsiteAgent):
 
         username_box = login_form.find_element(By.NAME, 'mobile')
         username_box.clear()
-        username_box.send_keys(self.username)
+        username = self.conf.get("caixin_username")
+        if not username:
+            raise ValueError("caixin_username is empty, cannot proceed")
+        username_box.send_keys(username)
         time.sleep(1)  # this is just to simulate real user
 
         password_box = login_form.find_element(By.NAME, 'password')
-        password_box.send_keys(self.password)
+        password = self.conf.get("caixin_password")
+        if not password:
+            raise ValueError("caixin_password is empty, cannot proceed")
+        password_box.send_keys(password)
         time.sleep(1)
 
         tos_selector = "#app > div > section > div > div.cx-login-argree > label > span > span"

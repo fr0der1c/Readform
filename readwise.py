@@ -28,6 +28,10 @@ def saver():
             while i <= 3:
                 time.sleep(3)
                 try:
+                    if current_conf.get_readwise_token() == "":
+                        logger.error("Readwise token is empty, cannot send article to readwise.")
+                        time.sleep(10)
+                        continue
                     status_code, content = _send_to_readwise_reader(item.url, item.content)
                     if status_code == 200 or status_code == 201:
                         logger.info(f"[Readwise] {status_code} Save {item.url} success: {content}")
@@ -62,9 +66,4 @@ def start_saver_thread():
 
 
 def init_readwise():
-    token = current_conf.get_readwise_token()
-    if not token:
-        logger.error("readwise token not set or empty")
-        exit(1)
-
     start_saver_thread()

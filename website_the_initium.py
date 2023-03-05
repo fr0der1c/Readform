@@ -8,32 +8,33 @@ from selenium.webdriver.support.expected_conditions import invisibility_of_eleme
 
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
-from website_base import WebsiteAgent
+from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST
+from conf_meta import ConfMeta, FIELD_TYPE_STR_LIST
 from readwise import send_to_readwise_reader, init_readwise
 from driver import get_browser
 
 
 class TheInitium(WebsiteAgent):
+    name = "the_initium"
+    conf_options = [
+        ConfMeta(
+            "Username", "Your username for The Initium.", "the_initium_username",required=True
+        ),
+        ConfMeta(
+            "Password", "Your password for The Initium.", "the_initium_password",required=True
+        ),
+        ConfMeta(
+            "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
+            typ=FIELD_TYPE_STR_LIST
+        ),
+    ]  # all config keys used
+
     def __init__(self, driver: WebDriver, conf: dict):
         super().__init__(driver, conf)
-        username = self.conf.get("the_initium_username")
-        if not username:
-            print("the_initium_username not found, cannot proceed")
-            exit(1)
-        password = self.conf.get("the_initium_password")
-        if not password:
-            print("the_initium_password not found, cannot proceed")
-            exit(1)
-        self.username = username
-        self.password = password
-
         self.base_domains = ["theinitium.com"]
         self.require_scrolling = True
         self.enable_rss_refreshing = True
         self.rss_addresses = ["https://theinitium.com/newsfeed/"]
-
-    def name(self) -> str:
-        return "the_initium"
 
     def check_finish_loading(self):
         if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
@@ -52,6 +53,9 @@ class TheInitium(WebsiteAgent):
         self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况
 
     def wait_article_body(self):
+        if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
+            # special handle for projects
+            return
         logger.info("waiting for article body to load...")
         get_element_with_wait(self.get_driver(), (By.CSS_SELECTOR, "div.article__body"))
         logger.info("body check passed")
@@ -94,11 +98,17 @@ class TheInitium(WebsiteAgent):
         login_form = get_element_with_wait(driver, (By.CSS_SELECTOR, "div.auth-form"))
 
         username_box = login_form.find_element(By.NAME, 'email')
-        username_box.send_keys(self.username)
+        username = self.conf.get("the_initium_username")
+        if not username:
+            raise ValueError("the_initium_username is empty, cannot proceed")
+        username_box.send_keys(username)
         time.sleep(1)  # this is just to simulate real user
 
         password_box = login_form.find_element(By.NAME, 'password')
-        password_box.send_keys(self.password)
+        password = self.conf.get("the_initium_password")
+        if not password:
+            raise ValueError("the_initium_password is empty, cannot proceed")
+        password_box.send_keys(password)
         time.sleep(1)
 
         next_button = login_form.find_element(By.XPATH, '//button[text()="登入"]')

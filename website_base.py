@@ -1,21 +1,29 @@
 import time
 import threading
+import queue
+import traceback
+from typing import Dict
 from abc import ABCMeta, abstractmethod
+from readwise import send_to_readwise_reader
+from conf import current_conf
 from selenium.webdriver.chrome.webdriver import WebDriver
 from tool_logging import logger
 from tool_rss import parse_rss_feed
-from persistence import filter_old_urls
+from persistence import filter_old_urls, mark_url_as_saved
 
 CONF_KEY_BLOCKLIST = "title_block_list"
 
 
-def contains_chinese(string:str)->bool:
+def contains_chinese(string: str) -> bool:
     for ch in string:
         if u'\u4e00' <= ch <= u'\u9fff':
             return True
 
 
 class WebsiteAgent(metaclass=ABCMeta):
+    name = ""  # name of the website
+    conf_options = []  # all config keys used
+
     def __init__(self, driver: WebDriver, conf: dict):
         self.driver = driver
         self._driver_lock = threading.Lock()
@@ -32,15 +40,11 @@ class WebsiteAgent(metaclass=ABCMeta):
         # If disabled, website updates will not be listened. Instead, you will need to
         # manually call API to save content to Readwise.
         self.rss_addresses = []
+        self._rss_refresh_thread = None
+
+        self.closing = False
 
         # todo add rate-limit related controls
-
-    @abstractmethod
-    def name(self) -> str:
-        """
-        Return name of the website.
-        """
-        pass
 
     @abstractmethod
     def check_finish_loading(self):
@@ -134,4 +138,86 @@ class WebsiteAgent(metaclass=ABCMeta):
                     logger.info(f"article '{item.title}' is filtered because it hits user block keyword list")
                 else:
                     latest_items.append(item)
-        return filter_old_urls(latest_items, agent=self.name()) if latest_items else []
+        return filter_old_urls(latest_items, agent=self.name) if latest_items else []
+
+    def start_refreshing_rss(self):
+        t = threading.Thread(target=refresh_rss, args=(self,), daemon=True)
+        t.start()
+
+    def close(self):
+        self.closing = True  # close rss thread
+        self.driver.quit()  # close browser
+
+
+article_retry_queue = queue.Queue()
+domain_agent_dict: Dict[str, WebsiteAgent] = {
+}
+
+
+class DomainNotSupportedException(Exception):
+    pass
+
+
+def get_page_content(url: str) -> str:
+    """inputs a URL and return full HTML"""
+    from urllib.parse import urlparse
+    domain = urlparse(url).netloc
+    domain = '.'.join(domain.split('.')[-2:])  # get base domain
+    if domain in domain_agent_dict:
+        return domain_agent_dict[domain].get_page_content(url)
+    else:
+        raise DomainNotSupportedException
+
+
+def handle_article(single_url: str, agent: str):
+    logger.info(f"Getting page content for {single_url}")
+    step_name = ""
+    try:
+        step_name = "getting content"
+        content = get_page_content(single_url)
+
+        step_name = "writing local file"
+        # write to local to help debug
+        with open("data/html/" + single_url.replace("/", "_").replace(":", "") + ".html", "w") as f:
+            f.write(content)
+
+        step_name = "sending to Reader"
+        logger.info(f"Sending to Readwise Reader...")
+        send_to_readwise_reader(single_url, content, agent=agent)
+    except Exception as e:
+        logger.error(
+            f"[{agent}] Got exception while {step_name}: \n{traceback.format_exc()}")
+        logger.error(f"Page {single_url} will be retried later.")
+        article_retry_queue.put(single_url)
+
+
+def refresh_rss(agent: WebsiteAgent):
+    """The loop to refresh RSS for a single website."""
+    is_first_run = True
+    while True:
+        if agent.closing:
+            logger.info(f"[{agent.name}] Thread exit")
+            return
+        logger.info(f"[{agent.name}] Start to refresh")
+        try:
+            urls = agent.refresh_rss()
+        except Exception as e:
+            logger.error(f"[{agent.name}] Got exception while refreshing RSS: {e.args}\n{traceback.format_exc()}")
+            continue
+        if len(urls) > 0 and not is_first_run or (is_first_run and current_conf.save_first_fetch()):
+            logger.info(f"[{agent.name}] Latest articles: {urls}")
+            for single_url in urls:
+                handle_article(single_url, agent.name)
+                time.sleep(10)
+        if is_first_run and not current_conf.save_first_fetch():
+            # mark all as saved
+            for single_url in urls:
+                mark_url_as_saved(single_url, "_system", "")
+            is_first_run = False
+        time.sleep(60)
+        try:
+            url = article_retry_queue.get_nowait()
+            if url:
+                handle_article(url, agent.name)
+        except queue.Empty:
+            pass

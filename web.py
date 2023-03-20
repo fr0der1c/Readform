@@ -96,7 +96,7 @@ def save_config():
 
 
 def web_interface():
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
 
 def run_web_interface():

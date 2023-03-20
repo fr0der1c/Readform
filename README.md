@@ -29,26 +29,13 @@ Running in Docker is the recommended way to use Readform. If you don't have Dock
 
 1. Run this program in Docker using the command below in the terminal:
     ```commandline
-    docker run --restart=always -d \
-        -e READFORM_WEBSITES=the_initium,caixin \
-        -e THE_INITIUM_USERNAME=[your-username] \
-        -e THE_INITIUM_PASSWORD=[your-password] \
-        -e CAIXIN_USERNAME=[your-username] \
-        -e CAIXIN_PASSWORD=[your-password] \
-        -e READWISE_TOKEN=[your-token] \
+    docker run --restart=always -d -p 5000:5000\
         -v [your-local-empty-path]:/var/app/data fr0der1c/readform:latest
     ```
-   `-e` represents adding an environment variable to the container. Currently, there are following environment variables available:
-   - `READFORM_WEBSITES`: the websites you are subscribed to. Required. Allowed values: `the_initium`, `caixin`.
-   - `READFORM_SAVE_FIRST_FETCH`: Whether to save first fetch of the feed. Allowed values: `yes`,`no`. The default value is `yes`, meaning articles in the first batch of fetch will be sent to Reader. If you already saved these pages, this will bump existing items to the top of your library. If you set to `no`, only new articles after the first fetch will be saved to Reader.
-   - `THE_INITIUM_USERNAME`: the username used to log in to The Initium. This is required if `the_initium` is in `READFORM_WEBSITES`, otherwise optional.
-   - `THE_INITIUM_PASSWORD`: the password used to log in to The Initium. This is required if `the_initium` is in `READFORM_WEBSITES`, otherwise optional.
-   - `CAIXIN_USERNAME`: the username used to log in to Caixin. This is required if `caixin` is in `READFORM_WEBSITES`, otherwise optional.
-   - `CAIXIN_PASSWORD`: the password used to log in to Caixin. This is required if `caixin` is in `READFORM_WEBSITES`, otherwise optional.
-   - `READWISE_TOKEN`: your Readwise token, [get it here](https://readwise.io/access_token)。
-   - `READWISE_READER_LOCATION`: the location you would like these articles to go to. Optional, default is `feed`. One of: `new`, `later`, `archive` or `feed`.
    The `-v` parameter binds a local directory to the app data directory in the container. This is necessary to persist data and states, such as articles saved to Reader. However, if you only want to have a quick test of functionalities, it's ok to omit this part.
-2. You're all set. New articles will appear in your Reader feed section. You can check the logs using `docker logs [container-id]` command if it didn't work well, since this is a rather new project and may contain bugs. If you see any abnormal logs/crashes/partial content, feel free to submit an issue!
+2. Visit http://localhost:5000 and configure Readform via web UI.
+   ![Readform screenshot](./screenshot.png)
+3. You're all set. New articles will appear in your Reader feed section. You can check the logs using `docker logs [container-id]` command if it didn't work well, since this is a rather new project and may contain bugs. If you see any abnormal logs/crashes/partial content, feel free to submit an issue!
 
 ## FAQ
 ### Is a subscription required for using this program?

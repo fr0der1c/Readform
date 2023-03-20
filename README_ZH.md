@@ -30,27 +30,14 @@ Readform 不是基于云的服务，您需要在自己的机器上运行它。�
 
 1. 在终端中使用以下命令以在 Docker 中运行此程序。运行后，您将看到一个 docker container ID 的输出：
      ```
-     docker run --restart=always -d \
-         -e READFORM_WEBSITES=the_initium,caixin\
-         -e THE_INITIUM_USERNAME=[你的用户名] \
-         -e THE_INITIUM_PASSWORD=[你的密码] \
-         -e CAIXIN_USERNAME=[你的用户名] \
-         -e CAIXIN_PASSWORD=[你的密码] \
-         -e READWISE_TOKEN=[你的token] \
+     docker run --restart=always -d -p 5000:5000\
          -v [你本地的某个空文件夹]:/var/app/data fr0der1c/readform:latest
      ```
-    `-e` 表示给容器添加环境变量。目前，有以下环境变量可用：
-    - `READFORM_WEBSITES`：您要订阅的网站。必填。 允许值：`the_initium`、`caixin`。
-    - `READFORM_SAVE_FIRST_FETCH`：是否保存 RSS feed 的第一次提取。 允许值：`yes`、`no`。 默认值为“yes”，这意味着程序运行后将立即将第一批文章保存到 Reader。如果您已经自己将这些网页保存到了 Reader，这会将这些项目添加到您的 library 的顶部。若更改为 no，则在程序启动后发布的新文章才会保存到 Reader。 
-    - `THE_INITIUM_USERNAME`：用于登录端的用户名。 如果 `the_initium` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。
-    - `THE_INITIUM_PASSWORD`：用于登录端的密码。 如果 `the_initium` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。
-    - `CAIXIN_USERNAME`：用于登录财新的用户名。 如果 `caixin` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。
-    - `CAIXIN_PASSWORD`：用于登录财新的密码。 如果 `caixin` 在 `READFORM_WEBSITES` 中，这是必需的，否则是可选的。
-    - `READWISE_TOKEN`: 您的 Readwise 的 token，[可在此处获取](https://readwise.io/access_token)。
-    - `READWISE_READER_LOCATION`：文章保存的位置。可选，默认为 `feed`。 有效值如下：`new`、`later`、`archive` 或 `feed`。
    
     `-v` 参数将本地文件夹绑定到容器中的数据存储文件夹，这是持久化数据所必需的，例如程序需要知道哪些文章已经保存到 Reader 过了，因此不用再次提交。但是，如果您只想快速测试本项目的功能，则可以省略这部分。该路径必须为绝对路径，例如，在 macOS 下可能为 `/Users/fr0der1c/readform_data`。
-2. 一切就绪。新文章将出现在您的 Reader 的 feed 流中。如果它并没有如期工作，您可以使用 `docker logs [container-id]` 命令检查日志，因为本项目仍处于萌芽阶段，并且可能包含 bug。 如果您看到任何异常日志/崩溃/文章不全的情况，请随时通过 GitHub issue 反馈！
+2. 访问 http://localhost:5000 并在网页中配置 Readform。
+   ![Readform screenshot](./screenshot.png)
+3. 一切就绪。新文章将出现在您的 Reader 的 feed 流中。如果它并没有如期工作，您可以使用 `docker logs [container-id]` 命令检查日志，因为本项目仍处于萌芽阶段，并且可能包含 bug。 如果您看到任何异常日志/崩溃/文章不全的情况，请随时通过 GitHub issue 反馈！
 
 ## FAQ
 ### 使用此程序需要订阅吗？

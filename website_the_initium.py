@@ -16,6 +16,7 @@ from driver import get_browser
 
 class TheInitium(WebsiteAgent):
     name = "the_initium"
+    display_name = "The Initium"
     conf_options = [
         ConfMeta(
             "Username", "Your username for The Initium.", "the_initium_username",required=True
@@ -28,10 +29,11 @@ class TheInitium(WebsiteAgent):
             typ=FIELD_TYPE_STR_LIST
         ),
     ]  # all config keys used
+    base_domains = ["theinitium.com"]
+    test_page = "https://theinitium.com/404"
 
     def __init__(self, driver: WebDriver, conf: dict):
         super().__init__(driver, conf)
-        self.base_domains = ["theinitium.com"]
         self.require_scrolling = True
         self.enable_rss_refreshing = True
         self.rss_addresses = ["https://theinitium.com/newsfeed/"]

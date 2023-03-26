@@ -60,7 +60,6 @@ def main_loop():
 
 # todo P1 open a HTTP port to provide RSS feed, so that non-Readwise Reader users can benefit
 #         from this project too (add QPS limit to avoid abuse!)
-# todo P2 provide custom feed url parameter
 
 if __name__ == "__main__":
     load_conf_from_file()

@@ -51,15 +51,16 @@ class ReadformConf:
 
     def export(self) -> dict:
         from website_base import WebsiteAgent
-        from conf_meta import ConfMeta, FIELD_TYPE_M_SELECTION, FIELD_TYPE_S_SELECTION, FIELD_TYPE_BOOL, FIELD_TYPE_STR
+        from conf_meta import ConfMeta, FIELD_TYPE_M_SELECTION, FIELD_TYPE_S_SELECTION, FIELD_TYPE_BOOL, FIELD_TYPE_STR, Selection
         meta = []
         agent_names = []
         for subclass in WebsiteAgent.__subclasses__():
             meta.append({
                 "section": subclass.name,
+                "display_name": subclass.display_name,
                 "configs": subclass.conf_options
             })
-            agent_names.append(subclass.name)
+            agent_names.append(Selection(subclass.name, subclass.display_name))
         meta.append({"section": GLOBAL_CONFIG_SECTION_NAME,
                      "configs": [
                          ConfMeta(
@@ -82,7 +83,10 @@ class ReadformConf:
                              "The location you would like to save to. Required. Default: feed.",
                              CONF_KEY_READER_LOCATION,
                              typ=FIELD_TYPE_S_SELECTION,
-                             selections=["feed", "new", "later", "archive"],
+                             selections=[Selection("feed", "Feed"),
+                                         Selection("new", "New"),
+                                         Selection("later", "Later"),
+                                         Selection("archive", "Archive")],
                              required=True,
                          ),
                          ConfMeta(

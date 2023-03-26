@@ -17,15 +17,11 @@ from readwise import send_to_readwise_reader, init_readwise
 
 
 class FT(WebsiteAgent):
-    name = "Financial Times"
+    name = "financial_times"
+    display_name = "Financial Times"  # display name of the website
     conf_options = [
         ConfMeta(
             "FT Username", "Your username for FT.", "username", required=True
-        ),
-        ConfMeta(
-            "Email verification Code",
-            "Email verification code will be used to login. Leave this field blank for the first time configuration. After receiving verification email from FT, fill in the code here. This field will be set to black again after login successfully.",
-            "access_code", required=False
         ),
         ConfMeta(
             "RSS feed link",
@@ -35,14 +31,20 @@ class FT(WebsiteAgent):
             required=True
         ),
         ConfMeta(
+            "Email verification Code",
+            "Email verification code will be used to login. Leave this field blank for the first time configuration. After receiving verification email from FT, fill in the code here. This field will be set to black again after login successfully.",
+            "access_code", required=False
+        ),
+        ConfMeta(
             "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
             typ=FIELD_TYPE_STR_LIST
         ),
     ]  # all config keys used
+    base_domains = ["ft.com"]
+    test_page = "https://www.ft.com/404"
 
     def __init__(self, driver: WebDriver, conf: dict):
         super().__init__(driver, conf)
-        self.base_domains = ["ft.com"]
         self.require_scrolling = False
         self.enable_rss_refreshing = True
         self.rss_addresses = []

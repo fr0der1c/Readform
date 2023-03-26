@@ -1,8 +1,9 @@
+import json
 import time
 import threading
 import queue
 import traceback
-from typing import Dict
+from typing import Dict, List
 from abc import ABCMeta, abstractmethod
 from readwise import send_to_readwise_reader
 from conf import current_conf
@@ -13,6 +14,8 @@ from persistence import filter_old_urls, mark_url_as_saved
 
 CONF_KEY_BLOCKLIST = "title_block_list"
 CONF_KEY_RSS_LINKS = "rss_links"
+
+COOKIE_PATH_PREFIX = "data/cookie_"
 
 
 class MembershipNotValidException(ValueError):
@@ -27,16 +30,22 @@ def contains_chinese(string: str) -> bool:
 
 class WebsiteAgent(metaclass=ABCMeta):
     name = ""  # name of the website
+    display_name = ""  # display name of the website
     conf_options = []  # all config keys used
+    base_domains = []
+    test_page = ""
 
     def __init__(self, driver: WebDriver, conf: dict):
         self.driver = driver
+        cookies = self.read_cookies()
+        if cookies:
+            self.driver.get(self.test_page)
+            for item in cookies:
+                self.driver.add_cookie(item)
         self._driver_lock = threading.Lock()
         self.conf = conf
 
         # ----------- Below are control options for a website ------------
-        self.base_domains = []
-
         self.require_scrolling = False
         # If enabled, each page will be scrolled over to let the lazy-loaded image load.
 
@@ -77,6 +86,7 @@ class WebsiteAgent(metaclass=ABCMeta):
             self.check_finish_loading()
             self.ensure_logged_in()
             self.check_finish_loading()
+            self.save_cookies()
 
             if self.require_scrolling:
                 self.scroll_page()
@@ -157,6 +167,20 @@ class WebsiteAgent(metaclass=ABCMeta):
     def close(self):
         self.closing = True  # close rss thread
         self.driver.quit()  # close browser
+
+    def save_cookies(self):
+        with open(COOKIE_PATH_PREFIX + self.name, "w") as f:
+            f.write(json.dumps(self.driver.get_cookies()))
+
+    def read_cookies(self) -> List[dict]:
+        try:
+            with open(COOKIE_PATH_PREFIX + self.name, "r") as f:
+                return json.loads(f.read())
+        except FileNotFoundError:
+            return list()
+        except json.decoder.JSONDecodeError:
+            logger.error(f"cookie file of agent {self.name} is not valid JSON")
+            return list()
 
 
 domain_agent_dict: Dict[str, WebsiteAgent] = {

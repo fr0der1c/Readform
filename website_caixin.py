@@ -17,6 +17,7 @@ from readwise import send_to_readwise_reader, init_readwise
 
 class Caixin(WebsiteAgent):
     name = "caixin"
+    display_name = "Caixin"  # display name of the website
     conf_options = [
         ConfMeta(
             "Caixin Username", "Your username for Caixin.", "caixin_username", required=True
@@ -25,19 +26,20 @@ class Caixin(WebsiteAgent):
             "Caixin Password", "Your password for Caixin.", "caixin_password", required=True
         ),
         ConfMeta(
+            "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
+            typ=FIELD_TYPE_STR_LIST
+        ),
+        ConfMeta(
             "Custom RSS feed link",
             "Default feed link is https://rsshub.app/caixin/latest. You can replace it with your own wanted feed link. Multiple links should split by comma(,).",
             CONF_KEY_RSS_LINKS, typ=FIELD_TYPE_STR_LIST,
         ),
-        ConfMeta(
-            "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
-            typ=FIELD_TYPE_STR_LIST
-        ),
     ]  # all config keys used
+    base_domains = ["caixin.com"]
+    test_page = "https://other.caixin.com/404/"
 
     def __init__(self, driver: WebDriver, conf: dict):
         super().__init__(driver, conf)
-        self.base_domains = ["caixin.com"]
         self.require_scrolling = False
         self.enable_rss_refreshing = True
         self.rss_addresses = ["https://rsshub.app/caixin/latest"]

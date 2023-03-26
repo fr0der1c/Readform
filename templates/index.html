@@ -57,7 +57,7 @@
 
     {% for section in config_options["meta"] %}
     <div class="row">
-        <h2>{% if section["section"] != "Global config" %}Website: {% endif %}{{ section["section"] }}</h2>
+        <h2>{% if section["section"] != "Global config" %}Website: {% endif %}{{ section["display_name"] }}</h2>
     </div>
     {% for config in section["configs"] %}
     <div class="row">
@@ -78,13 +78,13 @@
             <input class="form-control" name="{{form_id}}" value="{{ current_val | join(',') }}">
             {% elif config["typ"] == "single_selection" %}
             {% for option in config["selections"] %}
-            <input type="radio" name="{{form_id}}" value="{{option}}" {% if option in
-            current_val %} checked {% endif %}> {{ option }}
+            <input type="radio" name="{{form_id}}" value="{{option.value}}" {% if option.value in
+            current_val %} checked {% endif %}> {{ option.display_name }}
             {% endfor %}
             {% elif config["typ"] == "multiple_selection" %}
             {% for option in config["selections"] %}
-            <input type="checkbox" name="{{form_id}}" value="{{option}}" {% if option in
-            current_val %} checked {% endif %}> {{ option }}
+            <input type="checkbox" name="{{form_id}}" value="{{option.value}}" {% if option.value in
+            current_val %} checked {% endif %}> {{ option.display_name }}
             {% endfor %}
             {% elif config["typ"] == "bool" %}
             <input type="radio" name="{{form_id}}" value="True" {% if current_val %}

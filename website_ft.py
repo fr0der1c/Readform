@@ -50,7 +50,7 @@ class FT(WebsiteAgent):
         self.rss_addresses = []
 
     def check_finish_loading(self):
-        # self.wait_article_body()
+        self.wait_page_load()
         pass
 
     def wait_page_load(self):
@@ -67,21 +67,19 @@ class FT(WebsiteAgent):
         elif is_logged_in and is_paywalled:
             raise MembershipNotValidException("User is not a valid subscriber of FT. Cannot get full article content.")
         else:
-            logger.info("Paywall check passed.")
+            logger.info(f"Paywall check passed. is_paywalled: {is_paywalled} is_logged_in: {is_logged_in}")
 
     def is_logged_in(self) -> bool:
         try:
             elem = self.driver.find_element(by=By.CSS_SELECTOR, value="#o-header-top-link-myft")
             return elem.is_displayed()
         except Exception as e:
+            logger.warning(f"exception: {e}")
             return False
 
     def is_paywalled(self) -> bool:
-        try:
-            elem = self.driver.find_element(by=By.CSS_SELECTOR, value=".unlock_banner")
-            return elem.is_displayed()
-        except Exception as e:
-            return False
+        logger.warning(f"title: {self.driver.title}")
+        return self.driver.title.startswith("Subscribe to read")
 
     def login(self, driver: WebDriver):
         """

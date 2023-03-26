@@ -8,6 +8,7 @@ from abc import ABCMeta, abstractmethod
 from readwise import send_to_readwise_reader
 from conf import current_conf
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.support.wait import WebDriverWait
 from tool_logging import logger
 from tool_rss import parse_rss_feed
 from persistence import filter_old_urls, mark_url_as_saved
@@ -82,7 +83,15 @@ class WebsiteAgent(metaclass=ABCMeta):
         exclusive lock of Selenium driver of current agent.
         """
         with self._driver_lock:
+            self.driver.get("about:blank")
+            # Set to blank page to avoid elements on last page interfere checks based on element presence.
+
+            time.sleep(1)
             self.driver.get(url)
+            # time.sleep(1)  # I've tested, the sleep here is a must.
+            wait = WebDriverWait(self.driver, 300)
+            wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+
             self.check_finish_loading()
             self.ensure_logged_in()
             self.check_finish_loading()

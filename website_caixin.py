@@ -10,7 +10,7 @@ from selenium.webdriver.support.expected_conditions import invisibility_of_eleme
 from driver import get_browser
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
-from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST
+from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST, CONF_KEY_RSS_LINKS
 from conf_meta import ConfMeta, FIELD_TYPE_STR_LIST
 from readwise import send_to_readwise_reader, init_readwise
 
@@ -23,6 +23,11 @@ class Caixin(WebsiteAgent):
         ),
         ConfMeta(
             "Caixin Password", "Your password for Caixin.", "caixin_password", required=True
+        ),
+        ConfMeta(
+            "Custom RSS feed link",
+            "Default feed link is https://rsshub.app/caixin/latest. You can replace it with your own wanted feed link. Multiple links should split by comma(,).",
+            CONF_KEY_RSS_LINKS, typ=FIELD_TYPE_STR_LIST,
         ),
         ConfMeta(
             "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,

@@ -6,6 +6,7 @@ This program sends **full article content** of paywalled news websites to your [
 Currently supported websites:
 - The initium (端传媒)
 - Caixin (财新)
+- Financial Times (FT)
 
 Will be supported in the future:
 - WSJ（Wall street journal)

@@ -9,6 +9,8 @@ CONF_KEY_ENABLED_WEBSITES = "enabled_websites"
 
 GLOBAL_CONFIG_SECTION_NAME = "Global config"
 
+CONF_FILE = "data/conf.json"
+
 
 class ReadformConf:
     def __init__(self):
@@ -109,7 +111,7 @@ class ReadformConf:
         return item
 
     def write_disk(self):
-        with open("data/conf.json", "w") as f:
+        with open(CONF_FILE, "w") as f:
             f.write(json.dumps(self.dct))
 
 
@@ -120,7 +122,7 @@ def load_conf_from_file():
     """load conf from JSON config file"""
     global current_conf
     try:
-        with open("data/conf.json") as f:
+        with open(CONF_FILE) as f:
             current_conf.update_conf(json.loads(f.read()))
     except FileNotFoundError:
         logger.warning("Config file not found.")

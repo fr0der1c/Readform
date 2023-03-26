@@ -7,6 +7,7 @@ from web import run_web_interface
 from website_base import domain_agent_dict, WebsiteAgent
 from website_caixin import Caixin
 from website_the_initium import TheInitium
+from website_ft import FT
 from persistence import ensure_db_schema
 from driver import get_browser
 

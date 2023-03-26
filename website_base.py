@@ -12,6 +12,11 @@ from tool_rss import parse_rss_feed
 from persistence import filter_old_urls, mark_url_as_saved
 
 CONF_KEY_BLOCKLIST = "title_block_list"
+CONF_KEY_RSS_LINKS = "rss_links"
+
+
+class MembershipNotValidException(ValueError):
+    pass
 
 
 def contains_chinese(string: str) -> bool:
@@ -131,6 +136,11 @@ class WebsiteAgent(metaclass=ABCMeta):
         Refresh RSS to see if there are new content. A list of new article URLs
         will be returned. This method is called by framework if enable_rss_refreshing=True.
         """
+        # update self.rss_addresses from user conf
+        rss_links_from_conf = self.conf.get(CONF_KEY_RSS_LINKS)
+        if rss_links_from_conf is not None and len(rss_links_from_conf) > 0 and rss_links_from_conf != self.rss_addresses:
+            self.rss_addresses = self.conf.get(CONF_KEY_RSS_LINKS)
+
         latest_items = []
         for address in self.rss_addresses:
             for item in parse_rss_feed(address):
@@ -149,7 +159,6 @@ class WebsiteAgent(metaclass=ABCMeta):
         self.driver.quit()  # close browser
 
 
-article_retry_queue = queue.Queue()
 domain_agent_dict: Dict[str, WebsiteAgent] = {
 }
 
@@ -169,7 +178,7 @@ def get_page_content(url: str) -> str:
         raise DomainNotSupportedException
 
 
-def handle_article(single_url: str, agent: str):
+def handle_article(single_url: str, agent: str, article_retry_queue: queue.Queue):
     logger.info(f"Getting page content for {single_url}")
     step_name = ""
     try:
@@ -193,6 +202,7 @@ def handle_article(single_url: str, agent: str):
 
 def refresh_rss(agent: WebsiteAgent):
     """The loop to refresh RSS for a single website."""
+    article_retry_queue = queue.Queue()
     is_first_run = True
     while True:
         if agent.closing:
@@ -207,7 +217,7 @@ def refresh_rss(agent: WebsiteAgent):
         if len(urls) > 0 and not is_first_run or (is_first_run and current_conf.save_first_fetch()):
             logger.info(f"[{agent.name}] Latest articles: {urls}")
             for single_url in urls:
-                handle_article(single_url, agent.name)
+                handle_article(single_url, agent.name, article_retry_queue)
                 time.sleep(10)
         if is_first_run and not current_conf.save_first_fetch():
             # mark all as saved
@@ -218,6 +228,6 @@ def refresh_rss(agent: WebsiteAgent):
         try:
             url = article_retry_queue.get_nowait()
             if url:
-                handle_article(url, agent.name)
+                handle_article(url, agent.name, article_retry_queue)
         except queue.Empty:
             pass

@@ -19,10 +19,10 @@ class TheInitium(WebsiteAgent):
     display_name = "The Initium"
     conf_options = [
         ConfMeta(
-            "Username", "Your username for The Initium.", "the_initium_username",required=True
+            "Username", "Your username for The Initium.", "the_initium_username", required=True
         ),
         ConfMeta(
-            "Password", "Your password for The Initium.", "the_initium_password",required=True
+            "Password", "Your password for The Initium.", "the_initium_password", required=True
         ),
         ConfMeta(
             "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
@@ -39,7 +39,8 @@ class TheInitium(WebsiteAgent):
         self.rss_addresses = ["https://theinitium.com/newsfeed/"]
 
     def check_finish_loading(self):
-        if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
+        if self.get_driver().current_url.startswith("https://theinitium.com/project/") or \
+                self.get_driver().current_url.startswith("https://campaign.theinitium.com/"):
             # special handle for projects
             return
         logger.info("changing to simplified Chinese...")
@@ -55,7 +56,8 @@ class TheInitium(WebsiteAgent):
         self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况
 
     def wait_article_body(self):
-        if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
+        if self.get_driver().current_url.startswith("https://theinitium.com/project/") or \
+                self.get_driver().current_url.startswith("https://campaign.theinitium.com/"):
             # special handle for projects
             return
         logger.info("waiting for article body to load...")
@@ -71,7 +73,8 @@ class TheInitium(WebsiteAgent):
         logger.info("title check passed")
 
     def ensure_logged_in(self):
-        if self.get_driver().current_url.startswith("https://theinitium.com/project/"):
+        if self.get_driver().current_url.startswith("https://theinitium.com/project/") or \
+                self.get_driver().current_url.startswith("https://campaign.theinitium.com/"):
             # special handle for projects
             return
         if self.is_paywalled(self.get_driver()):

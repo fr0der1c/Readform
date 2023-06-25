@@ -1,6 +1,8 @@
+.DS_Store
 __pycache__
 data/html
 data/*.db
-data/conf.json
+data/*.json
+data/cookie_*
 *.log
 .idea

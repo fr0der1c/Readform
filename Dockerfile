@@ -1,4 +1,4 @@
-FROM python:3.10-bullseye
+FROM --platform=linux/amd64 python:3.10-bullseye
 LABEL maintainer="frederic.t.chan@gmail.com"
 ENV IS_IN_CONTAINER=1
 EXPOSE 5000

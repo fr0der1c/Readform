@@ -3,6 +3,7 @@ import os
 
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
+from selenium.common import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import invisibility_of_element_located
 
@@ -36,21 +37,29 @@ class TheInitium(WebsiteAgent):
         super().__init__(driver, conf)
         self.require_scrolling = True
         self.enable_rss_refreshing = True
-        self.rss_addresses = ["https://theinitium.com/newsfeed/"]
+        self.rss_addresses = ["https://rsshub.app/theinitium/channel/latest/zh-hans"]
 
     def check_finish_loading(self):
         if self.get_driver().current_url.startswith("https://theinitium.com/project/") or \
                 self.get_driver().current_url.startswith("https://campaign.theinitium.com/"):
             # special handle for projects
             return
-        logger.info("changing to simplified Chinese...")
-        language_button_locator = (By.XPATH, '//*[@id="user-panel"]/div[3]/div/div/button[2]')
-        simplified_button = get_element_with_wait(self.get_driver(), language_button_locator)
 
-        self.get_driver().execute_script("arguments[0].click();", simplified_button)
-        # this method can click invisible button
+        try:
+            logger.info("checking language...")
+            self.get_driver().find_element(By.CSS_SELECTOR, "button[aria-label='简体中文']")
+        except NoSuchElementException:
+            logger.info("changing to simplified Chinese...")
+            language_button_locator = (By.CSS_SELECTOR, "button[aria-label='繁體中文']")
+            lang_button = get_element_with_wait(self.get_driver(), language_button_locator)
+            self.get_driver().execute_script("arguments[0].click();", lang_button)
+            # this method can click invisible button
 
-        time.sleep(3)
+            language_button_locator = (By.XPATH, "//li[contains(text(), '简体中文')]")
+            lang_button = get_element_with_wait(self.get_driver(), language_button_locator)
+            self.get_driver().execute_script("arguments[0].click();", lang_button)
+
+            time.sleep(3)
 
         self.wait_article_body()
         self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况
@@ -61,7 +70,7 @@ class TheInitium(WebsiteAgent):
             # special handle for projects
             return
         logger.info("waiting for article body to load...")
-        get_element_with_wait(self.get_driver(), (By.CSS_SELECTOR, "div.article__body"))
+        get_element_with_wait(self.get_driver(), (By.CSS_SELECTOR, "div[itemprop='articleBody']"))
         logger.info("body check passed")
 
     def wait_title(self):

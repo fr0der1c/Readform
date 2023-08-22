@@ -92,10 +92,12 @@ class TheInitium(WebsiteAgent):
         else:
             logger.info("is not paywalled content or already logged in")
 
+    PAYWALL_LOCATOR = (By.XPATH,
+            "//h2[contains(text(), '閱讀全文，歡迎加入會員') or contains(text(), '阅读全文，欢迎加入会员')]")
+
     def is_paywalled(self, driver: WebDriver) -> bool:
         try:
-            driver.find_element(by=By.CSS_SELECTOR,
-                                value="#root > main > div.content__body > div > div.main-content > div.article__body > div.paywall")
+            driver.find_element(*self.PAYWALL_LOCATOR)
             return True
         except Exception as e:
             return False
@@ -106,35 +108,39 @@ class TheInitium(WebsiteAgent):
         to test if the code will work in different speed of network after each change.
         """
         logger.info("logging in...")
-        login_link_selector = "#root > main > div.content__body > div > div.main-content > div.article__body > div.paywall > div.link > button"
+
+        avatar_selector = "button[aria-label='帐号']"
+        avatar = get_element_with_wait(driver, (By.CSS_SELECTOR, avatar_selector))
+        avatar.click()
+
+        login_link_selector = "div[data-info='sign-in']"
         login_link = get_element_with_wait(driver, (By.CSS_SELECTOR, login_link_selector))
         login_link.click()
-        login_form = get_element_with_wait(driver, (By.CSS_SELECTOR, "div.auth-form"))
 
-        username_box = login_form.find_element(By.NAME, 'email')
+        submit_button = get_element_with_wait(driver, (By.CSS_SELECTOR, "button[type='submit']"))
+
+        username_box = driver.find_element(By.NAME, 'email')
         username = self.conf.get("the_initium_username")
         if not username:
             raise ValueError("the_initium_username is empty, cannot proceed")
         username_box.send_keys(username)
         time.sleep(1)  # this is just to simulate real user
 
-        password_box = login_form.find_element(By.NAME, 'password')
+        password_box = driver.find_element(By.NAME, 'password')
         password = self.conf.get("the_initium_password")
         if not password:
             raise ValueError("the_initium_password is empty, cannot proceed")
         password_box.send_keys(password)
         time.sleep(1)
 
-        next_button = login_form.find_element(By.XPATH, '//button[text()="登入"]')
-        next_button.click()
+        submit_button.click()
 
         # wait for login form to disappear
-        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(login_form))
+        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(submit_button))
         self.wait_article_body()
 
         # wait paywall to disappear
-        paywall_locator = (By.CSS_SELECTOR, "div.paywall")
-        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(paywall_locator))
+        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(self.PAYWALL_LOCATOR))
 
 
 if __name__ == '__main__':

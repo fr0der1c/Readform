@@ -9,7 +9,7 @@ from selenium.webdriver.support.expected_conditions import invisibility_of_eleme
 
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
-from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST
+from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST, CONF_KEY_RSS_LINKS
 from conf_meta import ConfMeta, FIELD_TYPE_STR_LIST
 from readwise import send_to_readwise_reader, init_readwise
 from driver import get_browser
@@ -28,6 +28,11 @@ class TheInitium(WebsiteAgent):
         ConfMeta(
             "Keyword Blocklist", "Keywords you want to filter out. Split by comma(,).", CONF_KEY_BLOCKLIST,
             typ=FIELD_TYPE_STR_LIST
+        ),
+        ConfMeta(
+            "Custom RSS feed link",
+            "Default feed link is https://rsshub.app/theinitium/channel/latest/zh-hans. You can replace it with your own wanted feed link. Multiple links should split by comma(,).",
+            CONF_KEY_RSS_LINKS, typ=FIELD_TYPE_STR_LIST,
         ),
     ]  # all config keys used
     base_domains = ["theinitium.com"]
@@ -93,7 +98,7 @@ class TheInitium(WebsiteAgent):
             logger.info("is not paywalled content or already logged in")
 
     PAYWALL_LOCATOR = (By.XPATH,
-            "//h2[contains(text(), '閱讀全文，歡迎加入會員') or contains(text(), '阅读全文，欢迎加入会员')]")
+                       "//h2[contains(text(), '閱讀全文，歡迎加入會員') or contains(text(), '阅读全文，欢迎加入会员')]")
 
     def is_paywalled(self, driver: WebDriver) -> bool:
         try:

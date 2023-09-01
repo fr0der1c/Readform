@@ -42,7 +42,7 @@ class TheInitium(WebsiteAgent):
         super().__init__(driver, conf)
         self.require_scrolling = True
         self.enable_rss_refreshing = True
-        self.rss_addresses = ["https://rsshub.app/theinitium/channel/latest/zh-hans"]
+        self.rss_addresses = ["https://theinitium.com/newsfeed/"]
 
     def check_finish_loading(self):
         if self.get_driver().current_url.startswith("https://theinitium.com/project/") or \

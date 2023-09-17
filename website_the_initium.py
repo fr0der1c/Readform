@@ -50,21 +50,46 @@ class TheInitium(WebsiteAgent):
             # special handle for projects
             return
 
-        try:
+        while True:
             logger.info("checking language...")
-            self.get_driver().find_element(By.CSS_SELECTOR, "button[aria-label='简体中文']")
-        except NoSuchElementException:
-            logger.info("changing to simplified Chinese...")
-            language_button_locator = (By.CSS_SELECTOR, "button[aria-label='繁體中文']")
-            lang_button = get_element_with_wait(self.get_driver(), language_button_locator)
-            self.get_driver().execute_script("arguments[0].click();", lang_button)
-            # this method can click invisible button
+            simplified_button_missing = True
+            traditional_button_missing = True
+            try:
+                self.get_driver().find_element(By.CSS_SELECTOR, "button[aria-label='简体中文']")
+            except NoSuchElementException:
+                simplified_button_missing = True
+            else:
+                simplified_button_missing = False
 
-            language_button_locator = (By.XPATH, "//li[contains(text(), '简体中文')]")
-            lang_button = get_element_with_wait(self.get_driver(), language_button_locator)
-            self.get_driver().execute_script("arguments[0].click();", lang_button)
+            try:
+                self.get_driver().find_element(By.CSS_SELECTOR, "button[aria-label='繁體中文']")
+            except NoSuchElementException:
+                traditional_button_missing = True
+            else:
+                traditional_button_missing = False
 
-            time.sleep(3)
+            if simplified_button_missing and not traditional_button_missing:
+                # 当前是繁体，要切换成简体
+                logger.info("changing to simplified Chinese...")
+                language_button_locator = (By.CSS_SELECTOR, "button[aria-label='繁體中文']")
+                lang_button = get_element_with_wait(self.get_driver(), language_button_locator)
+                self.get_driver().execute_script("arguments[0].click();", lang_button)
+                # this method can click invisible button
+
+                language_button_locator = (By.XPATH, "//li[contains(text(), '简体中文')]")
+                lang_button = get_element_with_wait(self.get_driver(), language_button_locator)
+                self.get_driver().execute_script("arguments[0].click();", lang_button)
+
+                time.sleep(3)
+            elif not simplified_button_missing and traditional_button_missing:
+                # 当前为简体，不做任何操作
+                break
+            elif simplified_button_missing and traditional_button_missing:
+                # 切换语言按钮尚未加载，重试
+                time.sleep(1)
+                continue
+            else:
+                logger.error(f"unexpected condition: {simplified_button_missing=} {traditional_button_missing=}")
 
         self.wait_article_body()
         self.wait_title()  # body 检测不够。有时会出现body加载完成但是标题没加载出来，导致 Reader 无法判断正确标题的情况

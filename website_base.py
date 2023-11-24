@@ -7,8 +7,10 @@ from typing import Dict, List
 from abc import ABCMeta, abstractmethod
 from readwise import send_to_readwise_reader
 from conf import current_conf
+from driver import get_browser
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common.exceptions import InvalidSessionIdException
 from tool_logging import logger
 from tool_rss import parse_rss_feed
 from persistence import filter_old_urls, mark_url_as_saved
@@ -157,7 +159,8 @@ class WebsiteAgent(metaclass=ABCMeta):
         """
         # update self.rss_addresses from user conf
         rss_links_from_conf = self.conf.get(CONF_KEY_RSS_LINKS)
-        if rss_links_from_conf is not None and len(rss_links_from_conf) > 0 and rss_links_from_conf != self.rss_addresses:
+        if rss_links_from_conf is not None and len(
+                rss_links_from_conf) > 0 and rss_links_from_conf != self.rss_addresses:
             self.rss_addresses = self.conf.get(CONF_KEY_RSS_LINKS)
 
         latest_items = []
@@ -202,11 +205,17 @@ class DomainNotSupportedException(Exception):
 
 def get_page_content(url: str) -> str:
     """inputs a URL and return full HTML"""
+    agent = get_agent_for_url(url)
+    return agent.get_page_content(url)
+
+
+def get_agent_for_url(url: str) -> WebsiteAgent:
+    """inputs a URL and return corresponding agent"""
     from urllib.parse import urlparse
     domain = urlparse(url).netloc
     domain = '.'.join(domain.split('.')[-2:])  # get base domain
     if domain in domain_agent_dict:
-        return domain_agent_dict[domain].get_page_content(url)
+        return domain_agent_dict[domain]
     else:
         raise DomainNotSupportedException
 
@@ -231,6 +240,10 @@ def handle_article(single_url: str, agent: str, article_retry_queue: queue.Queue
             f"[{agent}] Got exception while {step_name}: \n{traceback.format_exc()}")
         logger.error(f"Page {single_url} will be retried later.")
         article_retry_queue.put(single_url)
+    except InvalidSessionIdException:
+        logger.error(f"InvalidSessionIdException detected. try to reopen a browser.")
+        get_agent_for_url(single_url).driver.quit()
+        get_agent_for_url(single_url).driver = get_browser()
 
 
 def refresh_rss(agent: WebsiteAgent):

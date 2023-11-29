@@ -14,6 +14,7 @@ from selenium.common.exceptions import InvalidSessionIdException
 from tool_logging import logger
 from tool_rss import parse_rss_feed
 from persistence import filter_old_urls, mark_url_as_saved
+from selenium.webdriver.common.keys import Keys
 
 CONF_KEY_BLOCKLIST = "title_block_list"
 CONF_KEY_RSS_LINKS = "rss_links"
@@ -112,23 +113,22 @@ class WebsiteAgent(metaclass=ABCMeta):
 
     def scroll_page(self):
         """Scroll over page til the end."""
-        SCROLL_PAUSE_TIME = 0.5
-
-        # Get scroll height
-        last_height = self.driver.execute_script("return document.body.scrollHeight")
+        SCROLL_PAUSE_TIME = 0.1
 
         while True:
             # Scroll down to bottom
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            self.driver.execute_script("window.scrollBy(0, 200);")
 
             # Wait to load page
             time.sleep(SCROLL_PAUSE_TIME)
 
-            # Calculate new scroll height and compare with last scroll height
-            new_height = self.driver.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
+            js = "return Math.max( document.body.scrollHeight, document.body.offsetHeight,  document.documentElement.clientHeight,  document.documentElement.scrollHeight,  document.documentElement.offsetHeight);"
+            page_height = self.driver.execute_script(js)
+
+            # 判断是否已经滚动到了页面的最底部（判断标准是没必要翻下一次）
+            if page_height - self.driver.execute_script('return window.pageYOffset;') - self.driver.execute_script(
+                    'return window.innerHeight;') < 200:
                 break
-            last_height = new_height
 
     def get_driver(self) -> WebDriver:
         """

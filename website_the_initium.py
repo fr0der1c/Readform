@@ -6,10 +6,11 @@ from selenium.webdriver.common.by import By
 from selenium.common import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import invisibility_of_element_located
+from selenium.common.exceptions import TimeoutException
 
 from tool_selenium import get_element_with_wait
 from tool_logging import logger
-from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST, CONF_KEY_RSS_LINKS
+from website_base import WebsiteAgent, CONF_KEY_BLOCKLIST, CONF_KEY_RSS_LINKS, MembershipNotValidException
 from conf_meta import ConfMeta, FIELD_TYPE_STR_LIST
 from readwise import send_to_readwise_reader, init_readwise
 from driver import get_browser
@@ -55,14 +56,14 @@ class TheInitium(WebsiteAgent):
             simplified_button_missing = True
             traditional_button_missing = True
             try:
-                self.get_driver().find_element(By.CSS_SELECTOR, "button[aria-label='简体中文']")
+                self.get_driver().find_element(By.XPATH, "//button[@aria-label='搜寻']")
             except NoSuchElementException:
                 simplified_button_missing = True
             else:
                 simplified_button_missing = False
 
             try:
-                self.get_driver().find_element(By.CSS_SELECTOR, "button[aria-label='繁體中文']")
+                self.get_driver().find_element(By.XPATH, "//button[@aria-label='搜尋']")
             except NoSuchElementException:
                 traditional_button_missing = True
             else:
@@ -118,6 +119,20 @@ class TheInitium(WebsiteAgent):
             return
         if self.is_paywalled(self.get_driver()):
             logger.info("is paywalled content and not logged-in")
+            locator = self.get_driver().find_element(*self.PAYWALL_LOCATOR)
+            parent_parent_element = locator.find_element(By.XPATH, "../..")
+            login_link = parent_parent_element.find_element(By.XPATH, ".//descendant::a[text()='登入']")
+            login_link.click()
+            time.sleep(1)
+
+            # 关闭当前标签页并切换到最新的标签页
+            self.get_driver().close()
+            self.get_driver().switch_to.window(self.get_driver().window_handles[-1])
+
+            # 等待登录页面加载完成
+            wait = WebDriverWait(self.get_driver(), 300)
+            wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+
             self.login(self.get_driver())
         else:
             logger.info("is not paywalled content or already logged in")
@@ -137,26 +152,16 @@ class TheInitium(WebsiteAgent):
         Logs in using user credentials on an article page. Make sure to use throttle tool
         to test if the code will work in different speed of network after each change.
         """
-        logger.info("logging in...")
+        submit_button = driver.find_element(By.CSS_SELECTOR, "button[aria-label='登入']")
 
-        avatar_selector = "button[aria-label='帐号']"
-        avatar = get_element_with_wait(driver, (By.CSS_SELECTOR, avatar_selector))
-        avatar.click()
-
-        login_link_selector = "div[data-info='sign-in']"
-        login_link = get_element_with_wait(driver, (By.CSS_SELECTOR, login_link_selector))
-        login_link.click()
-
-        submit_button = get_element_with_wait(driver, (By.CSS_SELECTOR, "button[type='submit']"))
-
-        username_box = driver.find_element(By.NAME, 'email')
+        username_box = driver.find_element(By.CSS_SELECTOR, "input[type='email']")
         username = self.conf.get("the_initium_username")
         if not username:
             raise ValueError("the_initium_username is empty, cannot proceed")
         username_box.send_keys(username)
         time.sleep(1)  # this is just to simulate real user
 
-        password_box = driver.find_element(By.NAME, 'password')
+        password_box = driver.find_element(By.CSS_SELECTOR, "input[type='password']")
         password = self.conf.get("the_initium_password")
         if not password:
             raise ValueError("the_initium_password is empty, cannot proceed")
@@ -168,9 +173,13 @@ class TheInitium(WebsiteAgent):
         # wait for login form to disappear
         WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(submit_button))
         self.wait_article_body()
+        self.wait_title()
 
-        # wait paywall to disappear
-        WebDriverWait(driver, timeout=300).until(invisibility_of_element_located(self.PAYWALL_LOCATOR))
+        try:
+            # wait paywall to disappear
+            WebDriverWait(driver, timeout=10).until(invisibility_of_element_located(self.PAYWALL_LOCATOR))
+        except TimeoutException:
+            raise MembershipNotValidException("logged in but paywall still exists")
 
 
 if __name__ == '__main__':

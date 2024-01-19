@@ -34,13 +34,14 @@ Running in Docker is the recommended way to use Readform. If you don't have Dock
 
 1. To run this program in Docker, you can use the following command in your terminal:
     ```commandline
-    docker run --restart=always -d -p 5000:5000\
-        -v [your-local-empty-path]:/var/app/data fr0der1c/readform:latest
+     mkdir -p data && \
+     docker pull fr0der1c/readform:latest && \
+     docker ps -q --filter "name=^readform$" | xargs -r docker stop && \
+     docker run --rm --name readform -d -p 5000:5000 -v ./data:/var/app/data fr0der1c/readform:latest
     ```
-   The `-v` parameter is used to bind a local directory to the application's data directory within the Docker container. This is crucial for persisting data and maintaining states, such as articles saved to the Reader. However, if you're only interested in a quick functionality test, it's acceptable to omit this part.
 2. Visit http://localhost:5000 and configure Readform via web UI.
    ![Readform screenshot](./screenshot.png)
-3. You're all set. New articles will now appear in your Reader feed section. If you encounter any issues, you can check the logs using the `docker logs [container-id]` command. As this is a relatively new project, it may contain some bugs. If you notice any abnormal logs, crashes, or partial content, please don't hesitate to submit an issue!
+3. You're all set. New articles will now appear in your Reader feed section. If you encounter any issues, you can check the logs using the `docker logs readform` command. As this is a relatively new project, it may contain some bugs. If you notice any abnormal logs, crashes, or partial content, please don't hesitate to submit an issue!
 
 ## FAQ
 ### Is a subscription required for using this program?

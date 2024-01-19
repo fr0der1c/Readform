@@ -1,6 +1,11 @@
 # Readform
 [Chinese version](./README_ZH.md)
 
+**Important**: Readform 1.0.0 is now released with significant updates. This version has **completely rewritten** the entire codebase in Go language, replaced selenium with chromedp, and optimized database performance. We anticipate that this refactoring will make the program **more robust and reliable**. As some configuration fields have been adjusted and the database has been optimized, if you have been using Readform before version 1.0.0, we suggest you **delete the data directory** when upgrading and start using Readform from scratch.
+
+
+---------
+
 This program sends **full article content** of paywalled news websites to your [Readwise Reader](https://readwise.io/read) feed to help you get a unified reading workflow. RSS feed output may be supported in the future.
 
 Currently supported websites:
@@ -13,7 +18,7 @@ Will be supported in the future:
 - FTChinese（FT中文网）
 
 ## Why I built Readform
-There is plenty of high-quality subscription-based media on the market. And I respect their work. Being said that, I believe it's the subscriber's right to read in different forms he/she likes, e.g. RSS reader. **Pro readers have their own customized reading workflow. "Pro" media that charges for their articles should respect their reader's own choice.** Since there is no official full-article RSS feed support for these websites, I decided to make my own. 
+There is plenty of high-quality subscription-based media on the market. And I respect their work. Being said that, I believe it's the subscriber's right to read in different forms he/she likes, e.g. RSS reader. **Pro readers have their own customized reading workflow. "Pro" media that charges for their articles should respect their reader's own choice.** Since there is no official full-article RSS feed support for these websites, I decided to make my own.
 
 Currently, I use Readwise Reader as my RSS reader, so I made the Readwise Reader output integration. However, RSS output may also be supported in the future.
 

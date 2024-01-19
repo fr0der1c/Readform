@@ -1,5 +1,11 @@
 # Readform
 
+**重要**：Readform 1.0.0 重磅发布。这一版本使用 Go 语言**完全重写**了整个代码库，使用 chromedp 替换了 selenium，并优化了数据库性能。我们预期通过这一重构，让程序**更加健壮、可靠**。因部分配置字段进行了调整，数据库也进行了优化，如果您在 1.0.0 版本前已经在使用 Readform，建议您升级时**删除 data 目录**，从全新开始使用 Readform。
+
+
+---------
+
+
 该程序可以将付费新闻网站的**完整文章内容**发送到您的 [Readwise Reader](https://readwise.io/read) 的 feed 流中，以帮助您获得统一的阅读工作流。将来可能会支持 RSS 输出。
 
 目前支持的网站：
@@ -34,8 +40,8 @@ Readform 不是基于云的服务，您需要在自己的机器上运行它。�
      docker run --restart=always -d -p 5000:5000\
          -v [你本地的某个空文件夹]:/var/app/data fr0der1c/readform:latest
      ```
-   
-    `-v` 参数将本地文件夹绑定到容器中的数据存储文件夹，这是持久化数据所必需的，例如程序需要知道哪些文章已经保存到 Reader 过了，因此不用再次提交。但是，如果您只想快速测试本项目的功能，则可以省略这部分。该路径必须为绝对路径，例如，在 macOS 下可能为 `/Users/fr0der1c/readform_data`。
+
+   `-v` 参数将本地文件夹绑定到容器中的数据存储文件夹，这是持久化数据所必需的，例如程序需要知道哪些文章已经保存到 Reader 过了，因此不用再次提交。但是，如果您只想快速测试本项目的功能，则可以省略这部分。该路径必须为绝对路径，例如，在 macOS 下可能为 `/Users/fr0der1c/readform_data`。
 2. 访问 http://localhost:5000 并在网页中配置 Readform。
    ![Readform screenshot](./screenshot.png)
 3. 一切就绪。新文章将出现在您的 Reader 的 feed 流中。如果它并没有如期工作，您可以使用 `docker logs [container-id]` 命令检查日志，因为本项目仍处于萌芽阶段，并且可能包含 bug。 如果您看到任何异常日志/崩溃/文章不全的情况，请随时通过 GitHub issue 反馈！

@@ -17,14 +17,14 @@ Will be supported in the future:
 - FTChinese（FT中文网）
 
 ## Why I built Readform
-There's an abundance of high-quality, subscription-based media available on the market, and I have great respect for their work. However, I firmly believe that subscribers should have the freedom to consume content in the format they prefer, such as via an RSS reader. Professional readers often have their own customized reading workflows, and premium media outlets that charge for their content should respect this choice.
+There's an abundance of high-quality, subscription-based media available on the market, and I have great respect for their work. However, I firmly believe that subscribers should have the freedom to consume content in the format they prefer, such as via an RSS reader. Professional readers often have their own customized reading workflows, and premium media that charge for their content should respect this choice.
 
 Since these websites do not officially support full-article RSS feeds, I took it upon myself to create my own solution. At present, I use Readwise Reader as my RSS reader and have integrated it accordingly. However, I may also add support for RSS output in the future.
 
 The ultimate aim of this project is to encourage these websites to offer official full-content RSS feeds for their subscribers. Until that happens, let's make the most of this program!
 
 ## How it works
-The program continuously retrieves the latest articles using the website's RSS feed. When new articles are detected, it emulates a browser (utilizing Chrome and chromedp) and logs in with your credentials to access the full HTML content. Any lazy-loading images will be appropriately managed, ensuring no images are missing. The program will then forward the article URL and its HTML content to Readwise Reader via the official Reader API, making them available in your feed section.
+The program continuously retrieves the latest articles using the website's official RSS feed (or 3rd party RSS feed link, if no official RSS is provided). When new articles are detected, it emulates a browser and logs in with your credentials to access the full HTML content. Any lazy-loading images will be appropriately managed, ensuring no images are missing. The program will then forward the article URL and its HTML content to Readwise Reader via the official Reader API, making them available in your feed section.
 
 
 ## Quick start

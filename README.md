@@ -5,8 +5,7 @@
 
 
 ---------
-
-This program sends **full article content** of paywalled news websites to your [Readwise Reader](https://readwise.io/read) feed to help you get a unified reading workflow. RSS feed output may be supported in the future.
+This program delivers the **full article content** from paywalled news websites directly to your [Readwise Reader](https://readwise.io/read) feed, assisting in creating a unified reading workflow. Support for RSS feed output may be added in the future.
 
 Currently supported websites:
 - The initium (端传媒)
@@ -18,45 +17,45 @@ Will be supported in the future:
 - FTChinese（FT中文网）
 
 ## Why I built Readform
-There is plenty of high-quality subscription-based media on the market. And I respect their work. Being said that, I believe it's the subscriber's right to read in different forms he/she likes, e.g. RSS reader. **Pro readers have their own customized reading workflow. "Pro" media that charges for their articles should respect their reader's own choice.** Since there is no official full-article RSS feed support for these websites, I decided to make my own.
+There's an abundance of high-quality, subscription-based media available on the market, and I have great respect for their work. However, I firmly believe that subscribers should have the freedom to consume content in the format they prefer, such as via an RSS reader. Professional readers often have their own customized reading workflows, and premium media outlets that charge for their content should respect this choice.
 
-Currently, I use Readwise Reader as my RSS reader, so I made the Readwise Reader output integration. However, RSS output may also be supported in the future.
+Since these websites do not officially support full-article RSS feeds, I took it upon myself to create my own solution. At present, I use Readwise Reader as my RSS reader and have integrated it accordingly. However, I may also add support for RSS output in the future.
 
-The final goal of this project is to push these websites to provide their official full-content RSS feed for their subscribers. Before that, let's use this program!
+The ultimate aim of this project is to encourage these websites to offer official full-content RSS feeds for their subscribers. Until that happens, let's make the most of this program!
 
 ## How it works
-The program gets the latest articles using the website's RSS feed continuously. When there are new articles, it simulates a browser(using Firefox and Selenium) and logs in using your credentials to get full HTML content. Lazy-loading images will be properly handled, so you don't have to worry about missing images. The program will send the article URL and its HTML content to Readwise Reader using the official Reader API, so you can see them in your feed section.
+The program continuously retrieves the latest articles using the website's RSS feed. When new articles are detected, it emulates a browser (utilizing Chrome and chromedp) and logs in with your credentials to access the full HTML content. Any lazy-loading images will be appropriately managed, ensuring no images are missing. The program will then forward the article URL and its HTML content to Readwise Reader via the official Reader API, making them available in your feed section.
 
 
 ## Quick start
-Readform is not a cloud-based service. Instead, you need to run it on your own machine. This brings you maximum safety since your username and password are required for using this program. You can install Readform on a local device(PC, Mac, NAS, Raspberry Pi, ...) or deploy it on a VPS.
+Readform is not a cloud-based service; rather, it operates on your own device. This approach ensures maximum security, as your username and password are required to use the program. You can install Readform on a local device such as a PC, Mac, NAS, Raspberry Pi, etc., or you can deploy it on a Virtual Private Server (VPS).
 
 Running in Docker is the recommended way to use Readform. If you don't have Docker on your computer, you can [download it here](https://docs.docker.com/get-docker/).
 
-1. Run this program in Docker using the command below in the terminal:
+1. To run this program in Docker, you can use the following command in your terminal:
     ```commandline
     docker run --restart=always -d -p 5000:5000\
         -v [your-local-empty-path]:/var/app/data fr0der1c/readform:latest
     ```
-   The `-v` parameter binds a local directory to the app data directory in the container. This is necessary to persist data and states, such as articles saved to Reader. However, if you only want to have a quick test of functionalities, it's ok to omit this part.
+   The `-v` parameter is used to bind a local directory to the application's data directory within the Docker container. This is crucial for persisting data and maintaining states, such as articles saved to the Reader. However, if you're only interested in a quick functionality test, it's acceptable to omit this part.
 2. Visit http://localhost:5000 and configure Readform via web UI.
    ![Readform screenshot](./screenshot.png)
-3. You're all set. New articles will appear in your Reader feed section. You can check the logs using `docker logs [container-id]` command if it didn't work well, since this is a rather new project and may contain bugs. If you see any abnormal logs/crashes/partial content, feel free to submit an issue!
+3. You're all set. New articles will now appear in your Reader feed section. If you encounter any issues, you can check the logs using the `docker logs [container-id]` command. As this is a relatively new project, it may contain some bugs. If you notice any abnormal logs, crashes, or partial content, please don't hesitate to submit an issue!
 
 ## FAQ
 ### Is a subscription required for using this program?
-This project is completely free and open source. However, **you do need to be a subscriber of a website to get full article content**. We do not directly provide accounts or full article content because it's important for the press and authors to be financially supported to keep going.
+This project is entirely free and open source. However, it's important to note that **you must be a subscriber to a website to access its full article content**. We do not directly provide accounts or full article content, as it's crucial to financially support the press and authors to ensure their continued operations.
 
 ### Does this project bypasses paywall?
-No. This project aims to improve workflow for professional readers instead of breaking paywalls. You need to use your own credentials to log in to websites.
+No, this project is intended to enhance the workflow for professional readers, not to bypass paywalls. You are required to use your own credentials to log into websites.
 
 ### Is it safe to hand over my password?
-Yes. The program runs on your computer and your password will always stay local. We have no servers and do not collect usernames and passwords. The program only does necessary network requests to the sites you subscribed to, and your password will only be used on these sites.
+Yes, the program operates on your computer and your password will always remain local. We do not have servers and we do not collect usernames and passwords. The program only makes necessary network requests to the sites you are subscribed to, and your password will only be used on these sites.
 
 ### What if the website I wanted is not supported?
-I'm not planning to support all paywalled websites since this is a project that is intended to improve my reading workflow. However, the project provides easy-to-use interfaces, so you can add a website `Agent` easily. Pull requests are welcomed!
+While I don't intend to support all paywalled websites as this project is primarily designed to enhance my own reading workflow, the project does offer user-friendly interfaces. This makes it easy for you to add a website `Agent` as per your needs. Pull requests are always welcome!
 
 ## Disclaimer
-By using this code, you are considered to agree with the following statements:
+By using this code, you are deemed to agree with the following statements:
 
-This project is **only for personal use**, aiming to provide better reading experience. It only automates user actions on user's behalf and **does not break any limit set by website's owner in any way**. You should use at your own risk. 
+This project is intended **solely for personal use** with the aim of enhancing the reading experience. It merely automates user actions on the user's behalf and **does not in any way breach any restrictions set by the website's owner**. Use at your own risk.

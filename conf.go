@@ -143,7 +143,6 @@ func (c *ReadformConf) Export() (ConfExport, error) {
 			for j := range confOptions[i].SelectOptions {
 				if confOptions[i].SelectOptions[j].Value == confOptions[i].CurrentValue {
 					confOptions[i].SelectOptions[j].Selected = true
-					logger.Infof("111")
 				}
 			}
 		}

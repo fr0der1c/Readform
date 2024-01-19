@@ -344,14 +344,15 @@ func (a *WebsiteAgent) HandleArticle(url string) error {
 
 func (a *WebsiteAgent) StartRefreshingRSS() {
 	go func() {
-		select {
-		case <-a.closeChan:
-			return
-		default:
-			// continue refreshing RSS
-		}
 		isFirstRun := true
 		for {
+			select {
+			case <-a.closeChan:
+				return
+			default:
+				// continue refreshing RSS
+			}
+
 			logger.Infof("[%s] start to refresh RSS", a.Name())
 			articleURLs, err := a.refreshRSS()
 			if err != nil {

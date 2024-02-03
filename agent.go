@@ -242,6 +242,7 @@ const ScrollPauseTime = 300 * time.Millisecond
 const ScrollOffset = 200
 
 func (a *WebsiteAgent) scrollPage(ctx context.Context) error {
+	logger.Infof("[%s] scrolling page...", a.Name())
 	for {
 		// 向下滚动页面
 		err := chromedp.Run(ctx, chromedp.EvaluateAsDevTools(fmt.Sprintf("window.scrollBy(0, %d);", ScrollOffset), nil))

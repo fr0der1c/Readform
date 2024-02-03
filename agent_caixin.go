@@ -241,7 +241,7 @@ func (a *Caixin) EventListener(ctx context.Context) func(ev interface{}) {
 					page.HandleJavaScriptDialog(true),
 				)
 				if err != nil {
-					logger.Errorf("[caixin] HandleJavaScriptDialog failed: %w", err)
+					logger.Errorf("[caixin] HandleJavaScriptDialog failed: %v", err)
 				}
 			}()
 		}

@@ -125,7 +125,12 @@ func (a *WebsiteAgent) GetPageContent(url string) (currentURL string, htmlConten
 	a.driverLock.Lock()
 	defer a.driverLock.Unlock()
 
-	ctx, cancelFunc := chromedp.NewContext(a.ctx) // create a new tab for each GetPageContent call
+	// if not finished in 10 minutes, cancel request. This is to avoid abnormal page rendering
+	// (due to network issues) block the whole thing.
+	ctx, cancel := context.WithTimeout(a.ctx, 10*time.Minute)
+	defer cancel()
+
+	ctx, cancelFunc := chromedp.NewContext(ctx) // create a new tab for each GetPageContent call
 	defer func() {
 		cancelFunc()
 	}()

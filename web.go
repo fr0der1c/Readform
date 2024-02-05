@@ -66,14 +66,14 @@ func saveConfigHandler(w http.ResponseWriter, r *http.Request) {
 					"message": fmt.Sprintf(`Config "%s" is required`, config.ConfigName)})
 				return
 			}
-			if config.Type == FieldTypeString {
+			if config.Type == FieldTypeString && len(formValues) > 0 {
 				value := formValues[0]
 				if isRequired && value == "" {
 					json.NewEncoder(w).Encode(map[string]interface{}{"success": false,
 						"message": fmt.Sprintf(`Config "%s" under section "%s" is required`, config.ConfigName, confSection.DisplayName)})
 					return
 				}
-			} else if config.Type == FieldTypeBool {
+			} else if config.Type == FieldTypeBool && len(formValues) > 0 {
 				value := formValues[0]
 				if value != TrueLiteral && value != FalseLiteral {
 					json.NewEncoder(w).Encode(map[string]interface{}{"success": false,
@@ -88,14 +88,19 @@ func saveConfigHandler(w http.ResponseWriter, r *http.Request) {
 	for _, confSection := range confExport.ConfigSections {
 		for _, config := range confSection.Configs {
 			formValues := r.Form[confSection.Section+"__"+config.ConfigKey]
+			if len(formValues) == 0 {
+				continue
+			}
 			var structToChange reflect.Value
 			if confSection.Section == GlobalConfigSectionName {
 				// is global option
 				structToChange = reflect.ValueOf(currentConf)
 			} else {
 				// is agent option
-				agentConf := currentConf.AgentConfs[confSection.Section]
-				structToChange = reflect.ValueOf(agentConf)
+				if currentConf.AgentConfs[confSection.Section] == nil {
+					currentConf.AgentConfs[confSection.Section] = &AgentConf{}
+				}
+				structToChange = reflect.ValueOf(currentConf.AgentConfs[confSection.Section])
 			}
 
 			var err error

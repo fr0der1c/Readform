@@ -39,7 +39,7 @@ Running in Docker is the recommended way to use Readform. If you don't have Dock
      docker ps -q --filter "name=^readform$" | xargs -r docker stop && \
      docker run --rm --name readform -d -p 5000:5000 -v ./data:/var/app/data fr0der1c/readform:latest
     ```
-2. Visit http://localhost:5000 and configure Readform via web UI.
+2. Visit http://your-device-ip:5000 (if you're running on current computer, visit http://127.0.0.1:5000) and configure Readform via web UI.
    ![Readform screenshot](./screenshot.png)
 3. You're all set. New articles will now appear in your Reader feed section. If you encounter any issues, you can check the logs using the `docker logs readform` command. As this is a relatively new project, it may contain some bugs. If you notice any abnormal logs, crashes, or partial content, please don't hesitate to submit an issue!
 

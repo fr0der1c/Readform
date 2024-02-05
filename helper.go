@@ -29,6 +29,9 @@ func ContainsStringSlice(slice []string, str string) bool {
 }
 
 func GetValueByJSONTag(obj reflect.Value, tagName string) reflect.Value {
+	if obj.IsZero() {
+		return reflect.Value{}
+	}
 	if obj.Kind() == reflect.Ptr {
 		obj = obj.Elem()
 	}

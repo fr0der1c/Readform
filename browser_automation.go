@@ -16,6 +16,8 @@ func GetBrowserCtx() (context.Context, context.CancelFunc) {
 	if os.Getenv("IS_IN_CONTAINER") == "" {
 		options = append(options, chromedp.Flag("headless", false))
 	}
+	options = append(options, chromedp.Flag("enable-automation", false),
+		chromedp.Flag("disable-blink-features", "AutomationControlled"))
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), options...)
 	return allocCtx, cancel

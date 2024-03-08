@@ -17,7 +17,11 @@ func GetBrowserCtx() (context.Context, context.CancelFunc) {
 		options = append(options, chromedp.Flag("headless", false))
 	}
 	options = append(options, chromedp.Flag("enable-automation", false),
-		chromedp.Flag("disable-blink-features", "AutomationControlled"))
+		chromedp.Flag("disable-blink-features", "AutomationControlled"),
+		chromedp.Flag("remote-debugging-port", "5678"),
+		chromedp.WindowSize(2280, 1020),
+		// chromedp.Flag("lang", "zh-CN"),
+	)
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), options...)
 	return allocCtx, cancel

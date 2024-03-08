@@ -208,7 +208,7 @@ func (a *Caixin) login(ctx context.Context) error {
 	if password == "" {
 		return errors.New("password is empty, cannot proceed")
 	}
-
+	logger.Infof("next step: waiting icon to be visible")
 	err := chromedp.Run(ctx,
 		chromedp.WaitVisible(`#app > div > section > div > div:nth-child(1) > div > div > span > svg > use`),
 	)
@@ -221,6 +221,7 @@ func (a *Caixin) login(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("click icon failed: %w", err)
 	}
+	logger.Infof("next step: wait mobile input to be visible")
 	err = chromedp.Run(ctx,
 		chromedp.WaitVisible(`input[name='mobile']`),
 	)
@@ -233,12 +234,14 @@ func (a *Caixin) login(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("focus mobile input failed: %w", err)
 	}
+	logger.Infof("next step: clear mobile input")
 	err = chromedp.Run(ctx,
 		chromedp.Evaluate(`document.querySelector("input[name='mobile']").value = ""`, nil),
 	)
 	if err != nil {
 		return fmt.Errorf("clear mobile input failed: %w", err)
 	}
+	logger.Infof("next step: sending mobile number")
 	err = chromedp.Run(ctx,
 		chromedp.SendKeys(`input[name='mobile']`, username),
 		chromedp.Sleep(1*time.Second),
@@ -246,6 +249,7 @@ func (a *Caixin) login(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("input mobile number failed: %w", err)
 	}
+	logger.Infof("next step: send password")
 	err = chromedp.Run(ctx,
 		chromedp.SendKeys(`input[name='password']`, password),
 		chromedp.Sleep(1*time.Second),
@@ -260,6 +264,7 @@ func (a *Caixin) login(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("click agreement failed: %w", err)
 	}
+	logger.Infof("next step: click login button")
 	err = chromedp.Run(ctx,
 		chromedp.Click(`button.login-btn`),
 	)

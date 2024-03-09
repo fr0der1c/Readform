@@ -18,7 +18,7 @@ func GetBrowserCtx() (context.Context, context.CancelFunc) {
 	}
 	options = append(options, chromedp.Flag("enable-automation", false),
 		chromedp.Flag("disable-blink-features", "AutomationControlled"),
-		chromedp.Flag("remote-debugging-port", "5678"),       // use chrome://inspect to connect to remote target and debug
+		chromedp.Flag("remote-debugging-port", "9444"),       // use chrome://inspect to connect to remote target and debug
 		chromedp.Flag("remote-debugging-address", "0.0.0.0"), // allow access outside the container
 		chromedp.WindowSize(2280, 1020),
 		// chromedp.Flag("lang", "zh-CN"),

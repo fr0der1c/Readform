@@ -1,7 +1,7 @@
 FROM --platform=linux/amd64 golang:1-bullseye
 LABEL maintainer="frederic.t.chan@gmail.com"
 ENV IS_IN_CONTAINER=1
-EXPOSE 5000 5678
+EXPOSE 5000 9444
 
 WORKDIR /var/app
 

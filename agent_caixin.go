@@ -152,6 +152,15 @@ func (a *Caixin) EnsureLoggedIn(ctx context.Context) error {
 			return fmt.Errorf("failed to go to login page: %w", err)
 		}
 
+		currentURL, err := browser.GetCurrentURL(ctx)
+		if err != nil {
+			return fmt.Errorf("GetCurrentURL failed: %w", err)
+		}
+		if currentURL == "https://u.caixin.com/web/workbench" {
+			// already login
+			return fmt.Errorf("already logged in but still paywalled. Check if your subscription is valid")
+		}
+
 		err = a.login(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to login: %w", err)

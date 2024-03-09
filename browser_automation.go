@@ -6,23 +6,34 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 	"os"
+	"strconv"
+	"sync"
 	"time"
 )
+
+var nextRemoteDebuggingPort = 9444
+var remoteDebuggingPortAllocateLock = sync.Mutex{}
 
 func GetBrowserCtx() (context.Context, context.CancelFunc) {
 	options := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"),
 	)
 	if os.Getenv("IS_IN_CONTAINER") == "" {
-		options = append(options, chromedp.Flag("headless", false))
+		//options = append(options, chromedp.Flag("headless", false))
 	}
+
+	// use lock to avoid assigning a single port to multiple instance when concurrently calling this method
+	remoteDebuggingPortAllocateLock.Lock()
 	options = append(options, chromedp.Flag("enable-automation", false),
 		chromedp.Flag("disable-blink-features", "AutomationControlled"),
-		chromedp.Flag("remote-debugging-port", "9444"),       // use chrome://inspect to connect to remote target and debug
-		chromedp.Flag("remote-debugging-address", "0.0.0.0"), // allow access outside the container
+		chromedp.Flag("remote-debugging-port", strconv.FormatInt(int64(nextRemoteDebuggingPort), 10)), // use chrome://inspect to connect to remote target and debug
+		chromedp.Flag("remote-debugging-address", "0.0.0.0"),                                          // allow access outside the container
 		chromedp.WindowSize(2280, 1020),
 		// chromedp.Flag("lang", "zh-CN"),
 	)
+	logger.Infof("remote debugging port %v assigned", nextRemoteDebuggingPort)
+	nextRemoteDebuggingPort++
+	remoteDebuggingPortAllocateLock.Unlock()
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), options...)
 	return allocCtx, cancel

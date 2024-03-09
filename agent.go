@@ -62,10 +62,12 @@ func (a *WebsiteAgent) Init(ctx context.Context, cancelFunc context.CancelFunc, 
 	if a.TestPage() == "" {
 		return fmt.Errorf("testPage undefined, please define testPage for %s", a.Name())
 	}
+	logger.Infof("[%s] navigating to test page", a.Name())
 	err = chromedp.Run(a.ctx, chromedp.Navigate(a.TestPage()), browser.WaitUntilDocumentReady())
 	if err != nil {
 		return fmt.Errorf("load test page failed: %w", err)
 	}
+	logger.Infof("[%s] navigated to test page", a.Name())
 	if len(cookies) > 0 {
 		var actions []chromedp.Action
 		for _, cookie := range cookies {
